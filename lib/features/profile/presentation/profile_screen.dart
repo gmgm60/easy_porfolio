@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_porfolio/features/profile/data/profile_provider.dart';
-import 'package:easy_porfolio/core/theme/app_theme.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -37,7 +36,7 @@ class ProfileScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
                   Text(profile.name, style: textTheme.displayMedium),
                   const SizedBox(height: 4),
-                  Text(profile.title, style: textTheme.bodyLarge?.copyWith(color: AppTheme.onSurfaceVariantColor)),
+                  Text(profile.title, style: textTheme.bodyLarge?.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color)),
                   const SizedBox(height: 4),
                   Text(profile.location, style: textTheme.bodyMedium),
                 ],

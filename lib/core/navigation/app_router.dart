@@ -7,6 +7,7 @@ import 'package:easy_porfolio/features/profile/presentation/profile_screen.dart'
 import 'package:easy_porfolio/features/projects/presentation/projects_screen.dart';
 import 'package:easy_porfolio/features/contact/presentation/contact_screen.dart';
 import 'package:easy_porfolio/features/projects/presentation/project_details_screen.dart';
+import 'package:easy_porfolio/features/theme/presentation/theme_screen.dart';
 
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -46,6 +47,10 @@ final appRouter = GoRouter(
         GoRoute(
           path: '/contact',
           builder: (context, state) => const ContactScreen(),
+        ),
+        GoRoute(
+          path: '/theme',
+          builder: (context, state) => const ThemeScreen(),
         ),
       ],
     ),

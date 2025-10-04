@@ -23,7 +23,7 @@ class OnboardingScreen extends StatelessWidget {
                 width: 250,
                 height: 250,
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceColor,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(125),
                 ),
                 child: const Icon(

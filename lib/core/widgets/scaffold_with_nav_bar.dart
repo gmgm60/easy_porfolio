@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:easy_porfolio/features/theme/presentation/widgets/theme_switcher.dart';
 
 class ScaffoldWithNavBar extends StatefulWidget {
   final Widget child;
@@ -29,8 +30,8 @@ class _ScaffoldWithNavBarState extends State<ScaffoldWithNavBar> {
         case 2:
           context.go('/contact');
           break;
-        case 3: 
-          // Placeholder for Theme screen
+        case 3:
+          context.go('/theme');
           break;
       }
     });
@@ -39,6 +40,12 @@ class _ScaffoldWithNavBarState extends State<ScaffoldWithNavBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Easy Portfolio'),
+        actions: const [
+          ThemeSwitcher(),
+        ],
+      ),
       body: widget.child,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
