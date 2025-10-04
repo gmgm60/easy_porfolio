@@ -50,7 +50,9 @@ class _FeaturedProjectsList extends StatelessWidget {
         itemCount: projects.length,
         itemBuilder: (context, index) {
           final project = projects[index];
-          return _ProjectCard(project: project, isFeatured: true);
+          return SizedBox(
+              width: 300,
+              child: _ProjectCard(project: project, isFeatured: true));
         },
       ),
     );
