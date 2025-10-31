@@ -1,7 +1,7 @@
 
-import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dart';
 import 'package:flutter/material.dart';
- import 'package:go_router/go_router.dart';
+import 'package:easy_porfolio/core/theme/app_theme.dart';
+import 'package:go_router/go_router.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
@@ -9,7 +9,7 @@ class OnboardingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final colors = context.appColors;
+
     return Scaffold(
       body: Center(
         child: Padding(
@@ -26,9 +26,9 @@ class OnboardingScreen extends StatelessWidget {
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(125),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.bubble_chart,
-                  color: colors.primary,
+                  color: AppTheme.primaryColor,
                   size: 150,
                 ),
               ),
