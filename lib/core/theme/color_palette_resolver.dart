@@ -4,13 +4,10 @@ import 'package:easy_porfolio/core/theme/color_palettes.dart';
 
 /// Clean resolver: enum -> concrete palette (polymorphism via interface).
 ColorPalette resolvePalette(AppThemeType type) {
-  switch (type) {
-    case AppThemeType.light:
-      return const LightPalette();
-    case AppThemeType.dark:
-      return const DarkPalette();
+  final palettes = ColorPalette.all;
 
-    case AppThemeType.system:
-      return const LightPalette();
-  }
+  return palettes.firstWhere(
+    (palette) => palette.themeType == type,
+    orElse: LightPalette.new,
+  );
 }
