@@ -16,7 +16,9 @@ class _ScaffoldWithNavBarState extends State<ScaffoldWithNavBar> {
   int _currentIndex = 0;
 
   void _onTap(int index) {
-    if (index == _currentIndex) return;
+    if (index == _currentIndex) {
+      return;
+    }
 
     setState(() {
       _currentIndex = index;

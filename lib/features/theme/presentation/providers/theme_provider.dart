@@ -1,18 +1,18 @@
 
+import 'package:easy_porfolio/core/theme/app_theme_types.dart';
 import 'package:easy_porfolio/features/theme/domain/usecases/get_theme.dart';
 import 'package:easy_porfolio/features/theme/domain/usecases/set_theme.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_porfolio/features/theme/domain/repositories/theme_repository.dart';
 import 'package:easy_porfolio/features/theme/data/repositories/theme_repository_impl.dart';
 import 'package:easy_porfolio/features/theme/data/datasources/theme_local_datasource.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
-class ThemeNotifier extends StateNotifier<ThemeMode> {
+class ThemeNotifier extends StateNotifier<AppThemeType> {
   final GetThemeMode getThemeMode;
   final SetThemeMode setThemeMode;
 
-  ThemeNotifier({required this.getThemeMode, required this.setThemeMode}) : super(ThemeMode.system) {
+  ThemeNotifier({required this.getThemeMode, required this.setThemeMode}) : super(AppThemeType.system) {
     _loadInitialTheme();
   }
 
@@ -21,12 +21,12 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
   }
 
   Future<void> toggleTheme() async {
-    final newThemeMode = state == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    final newThemeMode = state == AppThemeType.light ? AppThemeType.dark : AppThemeType.light;
     state = newThemeMode;
     await setThemeMode(newThemeMode);
   }
 
-  Future<void> setTheme(ThemeMode themeMode) async {
+  Future<void> setTheme(AppThemeType themeMode) async {
     state = themeMode;
     await setThemeMode(themeMode);
   }
@@ -51,7 +51,7 @@ final setThemeModeProvider = Provider<SetThemeMode>((ref) {
   return SetThemeMode(repository);
 });
 
-final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>((ref) {
+final themeProvider = StateNotifierProvider<ThemeNotifier, AppThemeType>((ref) {
   final getThemeMode = ref.watch(getThemeModeProvider);
   final setThemeMode = ref.watch(setThemeModeProvider);
   return ThemeNotifier(getThemeMode: getThemeMode, setThemeMode: setThemeMode);

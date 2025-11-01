@@ -1,4 +1,5 @@
 
+import 'package:easy_porfolio/features/profile/data/models/experience.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_porfolio/features/profile/data/profile_provider.dart';
@@ -70,7 +71,7 @@ class ProfileScreen extends ConsumerWidget {
 }
 
 class _ExperienceTile extends StatelessWidget {
-  final dynamic experience;
+  final Experience experience;
   const _ExperienceTile({required this.experience});
 
   @override

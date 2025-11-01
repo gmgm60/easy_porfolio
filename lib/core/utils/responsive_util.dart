@@ -1,0 +1,49 @@
+import 'package:easy_porfolio/core/utils/screen_size.dart';
+import 'package:flutter/widgets.dart';
+
+
+
+/// General-purpose scaler: use for dimensions, font sizes, etc.
+class ResponsiveUtil {
+   static double scaleFactor(BuildContext context) {
+    final bucket = getScreenSize(context);
+     final deviceW = MediaQuery.sizeOf(context).width;
+    final designW = bucket.threshold;
+    return deviceW / designW;
+  }
+
+  /// Scales any numeric value (e.g., widths, heights) by the scale factor.
+  static double scale(BuildContext context, double value) {
+    return value * scaleFactor(context);
+  }
+
+  /// Scales font sizes and clamps them within ±20% of the original.
+  static double scaleFont(BuildContext context, double fontSize) {
+    final factor = scaleFactor(context);
+    final scaled = fontSize * factor;
+    final minSize = fontSize * 0.8;
+    final maxSize = fontSize * 1.2;
+    return scaled.clamp(minSize, maxSize);
+   }
+
+  /// Get the current screen size bucket
+  static ScreenSize getCurrentScreenSize(BuildContext context) {
+    return getScreenSize(context);
+  }
+
+  /// Check if current screen is mobile
+  static bool isMobile(BuildContext context) {
+    return getScreenSize(context) == ScreenSize.mobile ;
+  }
+
+  /// Check if current screen is tablet
+  static bool isTablet(BuildContext context) {
+    return getScreenSize(context) == ScreenSize.tablet;
+  }
+
+  /// Check if current screen is desktop
+  static bool isDesktop(BuildContext context) {
+    return getScreenSize(context) == ScreenSize.desktop;
+  }
+}
+

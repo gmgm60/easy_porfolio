@@ -1,7 +1,8 @@
 
+import 'package:easy_porfolio/core/theme/app_theme_types.dart';
 import 'package:flutter/material.dart';
 
 abstract class ThemeRepository {
-  Future<ThemeMode> getThemeMode();
-  Future<void> setThemeMode(ThemeMode themeMode);
+  Future<AppThemeType> getThemeMode();
+  Future<void> setThemeMode(AppThemeType themeMode);
 }

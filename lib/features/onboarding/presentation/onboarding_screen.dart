@@ -1,7 +1,7 @@
 
+import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dart';
 import 'package:flutter/material.dart';
-import 'package:easy_porfolio/core/theme/app_theme.dart';
-import 'package:go_router/go_router.dart';
+ import 'package:go_router/go_router.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
@@ -9,7 +9,7 @@ class OnboardingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-
+    final colors = context.appColors;
     return Scaffold(
       body: Center(
         child: Padding(
@@ -26,13 +26,13 @@ class OnboardingScreen extends StatelessWidget {
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(125),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.bubble_chart,
-                  color: AppTheme.primaryColor,
+                  color: colors.primary,
                   size: 150,
                 ),
               ),
-              const Spacer(flex: 1),
+              const Spacer(),
               Text(
                 'Craft Your Digital Identity',
                 textAlign: TextAlign.center,
@@ -53,7 +53,7 @@ class OnboardingScreen extends StatelessWidget {
                 },
                 child: const Text('Get Started'),
               ),
-              const Spacer(flex: 1),
+              const Spacer(),
             ],
           ),
         ),

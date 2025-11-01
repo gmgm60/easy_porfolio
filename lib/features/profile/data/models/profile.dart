@@ -1,6 +1,8 @@
 
-import './experience.dart';
-import './skill.dart';
+
+
+import 'package:easy_porfolio/features/profile/data/models/experience.dart';
+import 'package:easy_porfolio/features/profile/data/models/skill.dart';
 
 class Profile {
   final String name;
