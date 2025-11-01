@@ -1,3 +1,4 @@
+import 'package:easy_porfolio/core/theme/ui_overlay_style.dart';
 import 'package:easy_porfolio/core/widgets/adaptive_app_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,7 +8,6 @@ import 'package:easy_porfolio/core/theme/app_theme.dart';
 import 'package:easy_porfolio/features/theme/data/datasources/theme_local_datasource.dart';
 import 'package:easy_porfolio/features/theme/presentation/providers/theme_provider.dart';
 
-import '../../core/theme/ui_overlay_style.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

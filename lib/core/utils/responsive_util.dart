@@ -1,6 +1,7 @@
+import 'package:easy_porfolio/core/utils/screen_size.dart';
 import 'package:flutter/widgets.dart';
 
-import 'screen_size.dart';
+
 
 /// General-purpose scaler: use for dimensions, font sizes, etc.
 class ResponsiveUtil {

@@ -1,6 +1,6 @@
+import 'package:easy_porfolio/core/utils/responsive_util.dart';
 import 'package:flutter/material.dart';
 
-import '../../utils/responsive_util.dart';
 
 /// Extensions for ergonomic usage in widgets.
 extension ResponsiveExtensions on num {

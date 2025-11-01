@@ -1,18 +1,17 @@
 import 'package:easy_porfolio/core/extenstion/theme_extension.dart';
+import 'package:easy_porfolio/core/theme/color_palettes.dart';
+import 'package:easy_porfolio/core/theme/color_tokens.dart';
+import 'package:easy_porfolio/core/theme/components_theme.dart';
 import 'package:easy_porfolio/core/theme/radius_tokens.dart';
 import 'package:easy_porfolio/core/theme/spacing_tokens.dart';
 import 'package:easy_porfolio/core/theme/text_tokens.dart';
+import 'package:easy_porfolio/core/utils/screen_size.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'  ;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:google_fonts/google_fonts.dart';
-
-import '../utils/screen_size.dart';
-import 'color_palettes.dart';
-import 'color_tokens.dart';
-import 'components_theme.dart';
 
 class AppTheme {
   const AppTheme._();

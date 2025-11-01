@@ -1,9 +1,10 @@
+import 'package:easy_porfolio/core/theme/color_tokens.dart';
+import 'package:easy_porfolio/core/theme/radius_tokens.dart';
+import 'package:easy_porfolio/core/theme/spacing_tokens.dart';
+import 'package:easy_porfolio/core/theme/text_styles.dart';
+import 'package:easy_porfolio/core/theme/text_tokens.dart';
 import 'package:flutter/material.dart';
-import '../color_tokens.dart';
-import '../radius_tokens.dart';
-import '../spacing_tokens.dart';
-import '../text_styles.dart';
-import '../text_tokens.dart';
+
 
 extension ThemeExtensionsAccessors on BuildContext {
   AppColors get appColors {

@@ -395,7 +395,7 @@ ThemeData applyComponentThemes(
     // ===== Overlays =====
     dialogTheme: DialogThemeData(
       elevation: 0.6,
-      insetPadding: EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
       backgroundColor: appColors.surface,
       titleTextStyle: r.titleLargeTextStyle,
       contentTextStyle: r.bodyMediumTextStyle,

@@ -32,7 +32,7 @@ class OnboardingScreen extends StatelessWidget {
                   size: 150,
                 ),
               ),
-              const Spacer(flex: 1),
+              const Spacer(),
               Text(
                 'Craft Your Digital Identity',
                 textAlign: TextAlign.center,
@@ -53,7 +53,7 @@ class OnboardingScreen extends StatelessWidget {
                 },
                 child: const Text('Get Started'),
               ),
-              const Spacer(flex: 1),
+              const Spacer(),
             ],
           ),
         ),
