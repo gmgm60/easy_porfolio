@@ -1,4 +1,5 @@
 
+import 'package:easy_porfolio/core/theme/app_theme_types.dart';
 import 'package:easy_porfolio/features/theme/data/datasources/theme_local_datasource.dart';
 import 'package:easy_porfolio/features/theme/domain/repositories/theme_repository.dart';
 import 'package:flutter/material.dart';
@@ -9,12 +10,12 @@ class ThemeRepositoryImpl implements ThemeRepository {
   ThemeRepositoryImpl({required this.localDataSource});
 
   @override
-  Future<ThemeMode> getThemeMode() {
+  Future<AppThemeType> getThemeMode() {
     return localDataSource.getThemeMode();
   }
 
   @override
-  Future<void> setThemeMode(ThemeMode themeMode) {
+  Future<void> setThemeMode(AppThemeType themeMode) {
     return localDataSource.setThemeMode(themeMode);
   }
 }

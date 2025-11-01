@@ -1,46 +1,34 @@
+import 'package:easy_porfolio/core/theme/app_colors.dart';
 import 'package:easy_porfolio/core/theme/color_tokens.dart';
+import 'package:easy_porfolio/core/theme/radius_scale_extension.dart';
 import 'package:easy_porfolio/core/theme/radius_tokens.dart';
+import 'package:easy_porfolio/core/theme/spacing_scale_extension.dart';
 import 'package:easy_porfolio/core/theme/spacing_tokens.dart';
 import 'package:easy_porfolio/core/theme/text_styles.dart';
 import 'package:easy_porfolio/core/theme/text_tokens.dart';
+import 'package:easy_porfolio/core/theme/typography_scale_extension.dart';
 import 'package:flutter/material.dart';
-
 
 extension ThemeExtensionsAccessors on BuildContext {
   AppColors get appColors {
     final v = Theme.of(this).extension<AppColors>();
     assert(
       v != null,
-      'AppColors not found. Make sure you add LightAppColors/DarkAppColors to ThemeData.extensions.',
+      'AppColors not found. Make sure you add  AppColors to ThemeData.extensions.',
     );
     return v!;
   }
 
   AppTypographyTokens get typographyTokens {
-    final v = Theme.of(this).extension<AppTypographyTokens>();
-    assert(
-      v != null,
-      'AppTypographyTokens not found. Add the active token set (mobile/tablet/desktop) to ThemeData.extensions.',
-    );
-    return v!;
+    return Theme.of(this).tokensOf(this);
   }
 
   SpacingTokens get spacingTokens {
-    final v = Theme.of(this).extension<SpacingTokens>();
-    assert(
-      v != null,
-      'SpacingTokens not found. Register mobile/tablet/desktop spacing tokens in ThemeData.extensions.',
-    );
-    return v!;
+    return Theme.of(this).spacingOf(this);
   }
 
   RadiusTokens get radiusTokens {
-    final v = Theme.of(this).extension<RadiusTokens>();
-    assert(
-      v != null,
-      'RadiusTokens not found. Register your radius tokens in ThemeData.extensions.',
-    );
-    return v!;
+    return Theme.of(this).radiusOf(this);
   }
 
   TextStyles get textStyles {

@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 /// Signature for a function that returns the desired system UI overlay.
-typedef OverlayBuilder = SystemUiOverlayStyle Function(BuildContext context);
 
 /// A thin shell that renders either MaterialApp.router or CupertinoApp.router,
 /// keeping platform-specific concerns separate without duplicating your app code.
@@ -20,20 +19,18 @@ class AdaptiveApp extends StatelessWidget {
     super.key,
     required this.title,
     required this.router,
-   required this.themeMode,
-    required this.materialTheme,
+     required this.materialTheme,
     required this.cupertinoTheme,
-    required this.overlayBuilder,
+    required this.overlay ,
     this.showDebugBanner = false,
   });
 
   final String title;
   final GoRouter router;
-  final ThemeMode? themeMode;
-  final ThemeData materialTheme;
+   final ThemeData materialTheme;
   final CupertinoThemeData cupertinoTheme;
 
-  final OverlayBuilder overlayBuilder;
+  final SystemUiOverlayStyle overlay ;
 
   final bool showDebugBanner;
 
@@ -50,8 +47,7 @@ class AdaptiveApp extends StatelessWidget {
         debugShowCheckedModeBanner: showDebugBanner,
         theme: cupertinoTheme,
             builder: (context, child) {
-          final overlay = overlayBuilder(context);
-          return AnnotatedRegion<SystemUiOverlayStyle>(
+           return AnnotatedRegion<SystemUiOverlayStyle>(
             value: overlay,
 
             child: child!,
@@ -66,10 +62,8 @@ class AdaptiveApp extends StatelessWidget {
       routerConfig: router,
       debugShowCheckedModeBanner: showDebugBanner,
       theme: materialTheme,
-    themeMode:themeMode ,
-      builder: (context, child) {
-        final overlay = overlayBuilder(context);
-        return AnnotatedRegion<SystemUiOverlayStyle>(
+       builder: (context, child) {
+         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: overlay,
 
           child: child!,

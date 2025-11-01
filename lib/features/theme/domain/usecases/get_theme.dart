@@ -1,4 +1,5 @@
 
+import 'package:easy_porfolio/core/theme/app_theme_types.dart';
 import 'package:easy_porfolio/features/theme/domain/repositories/theme_repository.dart';
 import 'package:flutter/material.dart';
 
@@ -7,7 +8,7 @@ class GetThemeMode {
 
   GetThemeMode(this.repository);
 
-  Future<ThemeMode> call() {
+  Future<AppThemeType> call() {
     return repository.getThemeMode();
   }
 }

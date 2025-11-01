@@ -1,5 +1,5 @@
-import 'package:easy_porfolio/core/theme/color_tokens.dart';
-import 'package:easy_porfolio/core/theme/extension/font_scaling_extension.dart';
+import 'package:easy_porfolio/core/theme/app_colors.dart';
+ import 'package:easy_porfolio/core/theme/extension/font_scaling_extension.dart';
 import 'package:easy_porfolio/core/theme/text_tokens.dart';
 import 'package:flutter/material.dart';
 

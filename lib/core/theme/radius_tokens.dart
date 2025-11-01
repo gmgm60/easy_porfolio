@@ -89,3 +89,21 @@ const mobileRadiusTokens = RadiusTokens(
   radius23: 23,
   radius24: 24,
 );
+const tabletRadiusTokens = RadiusTokens(
+  radius4: 4,
+  radius8: 8,
+  radius10: 10,
+  radius12: 12,
+  radius16: 16,
+  radius23: 23,
+  radius24: 24,
+);
+const desktopRadiusTokens = RadiusTokens(
+  radius4: 4,
+  radius8: 8,
+  radius10: 10,
+  radius12: 12,
+  radius16: 16,
+  radius23: 23,
+  radius24: 24,
+);
