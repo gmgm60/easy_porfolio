@@ -51,7 +51,7 @@ class AppTheme {
       // register your ThemeExtensions
       extensions: <ThemeExtension<dynamic>>[
         palette.colors,
-        // SystemBars(bars),
+        SystemBars(bars),
         typographyTokens,
         const SpacingScale(
           mobile: mobileSpacingTokens,

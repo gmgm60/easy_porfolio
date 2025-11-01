@@ -1,3 +1,4 @@
+import 'package:easy_porfolio/core/theme/system_bars_extension.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,25 +20,22 @@ class AdaptiveApp extends StatelessWidget {
     super.key,
     required this.title,
     required this.router,
-     required this.materialTheme,
+    required this.materialTheme,
     required this.cupertinoTheme,
-    required this.overlay ,
     this.showDebugBanner = false,
   });
 
   final String title;
   final GoRouter router;
-   final ThemeData materialTheme;
+  final ThemeData materialTheme;
   final CupertinoThemeData cupertinoTheme;
-
-  final SystemUiOverlayStyle overlay ;
-
   final bool showDebugBanner;
 
   bool get isIOS => defaultTargetPlatform == TargetPlatform.iOS;
 
   @override
   Widget build(BuildContext context) {
+    final SystemUiOverlayStyle overlay = materialTheme.systemBars;
     if (isIOS) {
       // Pure Cupertino shell (router-based) with Material theming available
       return CupertinoApp.router(
@@ -46,8 +44,8 @@ class AdaptiveApp extends StatelessWidget {
         routerConfig: router,
         debugShowCheckedModeBanner: showDebugBanner,
         theme: cupertinoTheme,
-            builder: (context, child) {
-           return AnnotatedRegion<SystemUiOverlayStyle>(
+        builder: (context, child) {
+          return AnnotatedRegion<SystemUiOverlayStyle>(
             value: overlay,
 
             child: child!,
@@ -62,8 +60,8 @@ class AdaptiveApp extends StatelessWidget {
       routerConfig: router,
       debugShowCheckedModeBanner: showDebugBanner,
       theme: materialTheme,
-       builder: (context, child) {
-         return AnnotatedRegion<SystemUiOverlayStyle>(
+      builder: (context, child) {
+        return AnnotatedRegion<SystemUiOverlayStyle>(
           value: overlay,
 
           child: child!,
