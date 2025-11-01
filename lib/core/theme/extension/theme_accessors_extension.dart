@@ -1,5 +1,4 @@
 import 'package:easy_porfolio/core/theme/app_colors.dart';
-import 'package:easy_porfolio/core/theme/color_tokens.dart';
 import 'package:easy_porfolio/core/theme/radius_scale_extension.dart';
 import 'package:easy_porfolio/core/theme/radius_tokens.dart';
 import 'package:easy_porfolio/core/theme/spacing_scale_extension.dart';

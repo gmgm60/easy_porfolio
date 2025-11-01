@@ -1,5 +1,4 @@
 import 'package:easy_porfolio/core/theme/app_colors.dart';
-import 'package:easy_porfolio/core/theme/color_tokens.dart';
 import 'package:easy_porfolio/core/theme/text_styles.dart';
 import 'package:easy_porfolio/core/theme/text_tokens.dart';
 import 'package:flutter/material.dart';
