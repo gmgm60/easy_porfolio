@@ -64,7 +64,7 @@ class TextStyles {
   );
 
   TextStyle get headlineMediumTextStyle => TextStyle(
-    color: colors.info,
+    color: colors.textPrimary,
     fontSize: tokens.headlineMedium.sp(buildContext) ,
     height: tokens.lineHeight,
     fontWeight: FontWeight.w700,

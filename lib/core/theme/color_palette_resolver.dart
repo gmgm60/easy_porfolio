@@ -8,6 +8,6 @@ ColorPalette resolvePalette(AppThemeType type) {
 
   return palettes.firstWhere(
     (palette) => palette.themeType == type,
-    orElse: LightPalette.new,
+    orElse: DarkPalette.new,
   );
 }

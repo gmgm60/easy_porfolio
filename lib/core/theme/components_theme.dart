@@ -3,7 +3,6 @@ import 'package:easy_porfolio/core/theme/text_styles.dart';
 import 'package:easy_porfolio/core/theme/text_tokens.dart';
 import 'package:flutter/material.dart';
 
-
 /// Builds a comprehensive ThemeData by applying sub-themes for Material components.
 /// Uses only tokens and colors (no Theme.of during construction).
 ThemeData applyComponentThemes(
@@ -57,7 +56,7 @@ ThemeData applyComponentThemes(
         foregroundColor: appColors.onPrimary,
         backgroundColor: appColors.primary,
         textStyle: label?.merge(r.buttonTextStyle),
-        minimumSize: const Size(100, 40),
+        minimumSize: const Size(100, 50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),
@@ -89,7 +88,8 @@ ThemeData applyComponentThemes(
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         padding: EdgeInsets.zero,
-
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         foregroundColor: appColors.primary,
         textStyle: label?.merge(r.actionTextStyle),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -146,18 +146,17 @@ ThemeData applyComponentThemes(
 
     // ===== Inputs =====
     inputDecorationTheme: InputDecorationTheme(
-
       filled: true,
       fillColor: appColors.surface,
-    isDense: true,
+      isDense: true,
       isCollapsed: true,
       visualDensity: VisualDensity.standard,
       hintStyle: r.labelMediumTextStyle,
       labelStyle: r.labelLargeTextStyle,
       helperStyle: r.captionTextStyle,
       errorStyle: r.captionTextStyle.copyWith(color: appColors.error),
-      suffixIconConstraints:const BoxConstraints(minWidth: 30,minHeight: 30) ,
-      prefixIconConstraints:const BoxConstraints(minWidth: 30,minHeight: 30) ,
+      suffixIconConstraints: const BoxConstraints(minWidth: 30, minHeight: 30),
+      prefixIconConstraints: const BoxConstraints(minWidth: 30, minHeight: 30),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       enabledBorder: OutlineInputBorder(
         borderSide: BorderSide(color: appColors.borderStrong),
@@ -177,7 +176,6 @@ ThemeData applyComponentThemes(
       ),
       prefixIconColor: appColors.textSecondary,
       suffixIconColor: appColors.textSecondary,
-
     ),
 
     // ===== Segmented / Toggle =====
@@ -497,7 +495,7 @@ ThemeData applyComponentThemes(
       thickness: 1,
       space: 1,
     ),
-    iconTheme: IconThemeData(color: appColors.onSurface,),
+    iconTheme: IconThemeData(color: appColors.onSurface),
 
     // ===== Data / Lists =====
     expansionTileTheme: ExpansionTileThemeData(
