@@ -1,7 +1,10 @@
 import 'package:easy_porfolio/core/services/messaging_service/helper_message.dart';
 import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dart';
 import 'package:easy_porfolio/core/utils/validator.dart';
+import 'package:easy_porfolio/core/widgets/animated_size_visibility.dart';
+import 'package:easy_porfolio/core/widgets/custom_animated_card.dart';
 import 'package:easy_porfolio/core/widgets/error_banner_widget.dart';
+import 'package:easy_porfolio/core/widgets/text_link_widget.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/admin_header_widget.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/auth_text_field_widget.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/label_field_widget.dart';
@@ -60,7 +63,6 @@ class _AdminLoginPageState extends State<AdminLoginPage>
       return;
     }
 
-
     if (!form.validate()) {
       return;
     }
@@ -77,13 +79,12 @@ class _AdminLoginPageState extends State<AdminLoginPage>
         return;
       }
 
-    ToastMessage.success(message: "Logged in successfully", ctx: context);
+      ToastMessage.success(message: "Logged in successfully", ctx: context);
       // Navigate to dashboard here
-    }
-    else {
+    } else {
       setState(() {
         _formError =
-            "We couldn't find an account with those credentials. Double-check your email and password.";
+        "We couldn't find an account with those credentials. Double-check your email and password.";
       });
     }
 
@@ -94,9 +95,9 @@ class _AdminLoginPageState extends State<AdminLoginPage>
 
   @override
   Widget build(BuildContext context) {
-
+    final gap = context.spacingTokens;
     return Scaffold(
-       body: SafeArea(
+      body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
             final isWide = constraints.maxWidth > 600;
@@ -113,111 +114,71 @@ class _AdminLoginPageState extends State<AdminLoginPage>
                     opacity: _fade,
                     child: SlideTransition(
                       position: _slide,
-                      child: _AuthCard(
+                      child: CustomAnimatedCard(
                         child: Form(
-                          key: _formKey,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Center(child: AdminHeaderWidget()),
-                              const SizedBox(height: 32),
-                              LabelFieldWidget(
-                                label: "Email",
-                                child: AuthTextFieldWidget(
-                                  controller: _emailCtrl,
-                                  hintText: "Enter your email",
-                                  keyboardType: TextInputType.emailAddress,
-                                  prefixIcon: Icons.mail_outline,
-                                  validator: Validators.validateEmail,
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              LabelFieldWidget(
-                                label: "Password",
-                                child: PasswordFieldWidget(
-                                  controller: _passwordCtrl,
-                                  validator: Validators.validatePassword,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: TextButton(
-                                  onPressed: _isSubmitting ? null : () {},
-                                  child: Text(
-                                    "Forgot Password?",
-                                    style: context.textStyles.buttonTextStyle.copyWith(color: context.appColors.primary),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              AnimatedSize(
-                                duration: const Duration(milliseconds: 250),
-                                curve: Curves.easeOutCubic,
-                                child: _formError == null
-                                    ? const SizedBox.shrink()
-                                    : Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 8.0,
-                                        ),
-                                        child: ErrorBannerWidget(
-                                          message: _formError!,
-                                        ),
-                                      ),
-                              ),
-                              const SizedBox(height: 8),
-                               PrimaryButtonWidget(
-                                label: "Login",
-                                isLoading: _isSubmitting,
-                                onPressed: _isSubmitting ? null : _submit,
-                              ),
-                            ],
+                            key: _formKey,
+                            child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                const Center(child: AdminHeaderWidget()),
+                        const SizedBox(height: 32),
+                        LabelFieldWidget(
+                          label: "Email",
+                          child: AuthTextFieldWidget(
+                            controller: _emailCtrl,
+                            hintText: "Enter your email",
+                            keyboardType: TextInputType.emailAddress,
+                            prefixIcon: Icons.mail_outline,
+                            validator: Validators.validateEmail,
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+                        LabelFieldWidget(
+                          label: "Password",
+                          child: PasswordFieldWidget(
+                            controller: _passwordCtrl,
+                            validator: Validators.validatePassword,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextLinkWidget(
+                              text: "Forgot Password?",
+                              onPressed: _isSubmitting ? null : () {},
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      AnimatedSizeVisibility(
+                        isVisible: _formError != null,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: ErrorBannerWidget(
+                            message: _formError ?? '',
                           ),
                         ),
                       ),
+                      const SizedBox(height: 8),
+                      PrimaryButtonWidget(
+                        label: "Login",
+                        isLoading: _isSubmitting,
+                        onPressed: _isSubmitting ? null : _submit,
+                      ),
+                      ],
                     ),
                   ),
                 ),
               ),
+            ),)
+            ,
+            )
+            ,
             );
           },
         ),
       ),
     );
   }
-
-
 }
-
-/// Card Shell
-class _AuthCard extends StatelessWidget {
-  const _AuthCard({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    final radius = context.radiusTokens;
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
-      padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: radius.all16,
-        border: Border.all(color: colors.textMuted.withValues(alpha: 0.8)),
-        boxShadow: [
-          BoxShadow(
-             blurRadius: 55,
-             offset: const Offset(1, 1),
-            color: colors.onSurface.withValues(alpha: 0.3),
-          ),
-        ],
-      ),
-      child: child,
-    );
-  }
-}
-
