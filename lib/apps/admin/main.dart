@@ -12,6 +12,6 @@ Future<void> main() async {
   await runSharedApp(
     sharedPreferences: sharedPreferences,
     router: router,
-    title: 'Easy Portfolio',
+    title: 'Admin App',
   );
 }
