@@ -38,8 +38,7 @@ class TextStyles {
     color: colors.textPrimary,
     fontSize: tokens.titleSmall.sp(buildContext) ,
     height: tokens.lineHeight,
-    fontWeight: FontWeight.w600,
-  );
+   );
 
   TextStyle get titleMediumTextStyle => TextStyle(
     color: colors.textPrimary,

@@ -11,6 +11,7 @@ import 'package:easy_porfolio/features/auth/presentation/widgets/label_field_wid
 import 'package:easy_porfolio/features/auth/presentation/widgets/passord_field_widget.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/primary_button_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({super.key});
@@ -80,11 +81,12 @@ class _AdminLoginPageState extends State<AdminLoginPage>
       }
 
       ToastMessage.success(message: "Logged in successfully", ctx: context);
+      context.go('/Dashboard');
       // Navigate to dashboard here
     } else {
       setState(() {
         _formError =
-        "We couldn't find an account with those credentials. Double-check your email and password.";
+            "We couldn't find an account with those credentials. Double-check your email and password.";
       });
     }
 
@@ -116,65 +118,64 @@ class _AdminLoginPageState extends State<AdminLoginPage>
                       position: _slide,
                       child: CustomAnimatedCard(
                         child: Form(
-                            key: _formKey,
-                            child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                const Center(child: AdminHeaderWidget()),
-                        const SizedBox(height: 32),
-                        LabelFieldWidget(
-                          label: "Email",
-                          child: AuthTextFieldWidget(
-                            controller: _emailCtrl,
-                            hintText: "Enter your email",
-                            keyboardType: TextInputType.emailAddress,
-                            prefixIcon: Icons.mail_outline,
-                            validator: Validators.validateEmail,
-                          ),
-                        ),
+                          key: _formKey,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Center(child: AdminHeaderWidget()),
+                              const SizedBox(height: 32),
+                              LabelFieldWidget(
+                                label: "Email",
+                                child: AuthTextFieldWidget(
+                                  controller: _emailCtrl,
+                                  hintText: "Enter your email",
+                                  keyboardType: TextInputType.emailAddress,
+                                  prefixIcon: Icons.mail_outline,
+                                  validator: Validators.validateEmail,
+                                ),
+                              ),
 
-                        const SizedBox(height: 20),
-                        LabelFieldWidget(
-                          label: "Password",
-                          child: PasswordFieldWidget(
-                            controller: _passwordCtrl,
-                            validator: Validators.validatePassword,
+                              const SizedBox(height: 20),
+                              LabelFieldWidget(
+                                label: "Password",
+                                child: PasswordFieldWidget(
+                                  controller: _passwordCtrl,
+                                  validator: Validators.validatePassword,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextLinkWidget(
+                                  text: "Forgot Password?",
+                                  onPressed: _isSubmitting ? null : () {},
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              AnimatedSizeVisibility(
+                                isVisible: _formError != null,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: ErrorBannerWidget(
+                                    message: _formError ?? '',
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              PrimaryButtonWidget(
+                                label: "Login",
+                                isLoading: _isSubmitting,
+                                onPressed: _isSubmitting ? null : _submit,
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextLinkWidget(
-                              text: "Forgot Password?",
-                              onPressed: _isSubmitting ? null : () {},
-                        ),
                       ),
-                      const SizedBox(height: 16),
-                      AnimatedSizeVisibility(
-                        isVisible: _formError != null,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: ErrorBannerWidget(
-                            message: _formError ?? '',
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      PrimaryButtonWidget(
-                        label: "Login",
-                        isLoading: _isSubmitting,
-                        onPressed: _isSubmitting ? null : _submit,
-                      ),
-                      ],
                     ),
                   ),
                 ),
               ),
-            ),)
-            ,
-            )
-            ,
             );
           },
         ),
