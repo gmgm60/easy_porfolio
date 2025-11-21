@@ -39,7 +39,7 @@ Future<void> runSharedApp({
     final cupertinoTheme = AppTheme.ofCupertino(materialTheme);
 
     return ToastListOverlay<ToastModel>(
-      position:Alignment.center ,
+      // position:Alignment.topCenter ,
       itemBuilder: buildToastItem,
       child: AdaptiveApp(
         title: title,
