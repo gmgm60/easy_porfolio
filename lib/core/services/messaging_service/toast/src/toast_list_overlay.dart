@@ -241,7 +241,6 @@ class ToastListOverlayState<T> extends State<ToastListOverlay<T>> {
 
 class _ToastListScope extends InheritedWidget {
   const _ToastListScope({
-    super.key,
     required super.child,
     required ToastListOverlayState toastListOverlayState,
   }) : _toastListOverlayState = toastListOverlayState;

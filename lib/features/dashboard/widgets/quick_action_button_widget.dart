@@ -1,7 +1,6 @@
 import 'package:easy_porfolio/core/theme/extension/font_scaling_extension.dart';
 import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dart';
-import 'package:easy_porfolio/core/utils/screen_size.dart';
-import 'package:flutter/material.dart';
+ import 'package:flutter/material.dart';
 
 class QuickActionButtonWidget extends StatelessWidget {
   const QuickActionButtonWidget({
