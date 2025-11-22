@@ -1,13 +1,10 @@
 import 'package:easy_porfolio/core/utils/smooth_scroll_behavior.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/slide_fade_transition_widget.dart';
-import 'package:easy_porfolio/features/dashboard/widgets/dashboard_top_bar_widget.dart';
 import 'package:easy_porfolio/features/dashboard/widgets/metric_card_widget.dart';
 import 'package:easy_porfolio/features/dashboard/widgets/quick_action_button_widget.dart';
 import 'package:easy_porfolio/features/dashboard/widgets/segmented_tabs_widget.dart';
 import 'package:easy_porfolio/features/dashboard/widgets/traffic_chart_painter_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
-
 
 /// Dashboard main screen
 class DashboardPage extends StatefulWidget {
@@ -24,22 +21,16 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return  Column(
+      crossAxisAlignment: .stretch,
       children: [
-        // This Expanded widget contains all the content that should scroll.
         Expanded(
           child: ScrollConfiguration(
             behavior: const SmoothNoBarScrollBehavior(),
             child: SingleChildScrollView(
-               physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics(),
-              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  DashboardTopBarWidget(onPressedMenu:()=>ZoomDrawer.of(context)?.toggle()),
-                  const SizedBox(height: 16),
                   // Add staggered entrance animations for a polished feel.
                   const SlideFadeTransitionWidget(
                     child: MetricCardWidget(
@@ -85,7 +76,8 @@ class _DashboardPageState extends State<DashboardPage> {
                             child: SegmentedTabsWidget(
                               current: _range,
                               options: const ['Week', 'Month', 'Year'],
-                              onChanged: (value) => setState(() => _range = value),
+                              onChanged: (value) =>
+                                  setState(() => _range = value),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -101,15 +93,16 @@ class _DashboardPageState extends State<DashboardPage> {
                             children: [
                               Text(
                                 '1.4k',
-                                style: theme.textTheme.headlineMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: theme.textTheme.headlineMedium
+                                    ?.copyWith(fontWeight: FontWeight.w600),
                               ),
                               const SizedBox(width: 4),
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 2.0),
-                                child: Text('Views',
-                                    style: theme.textTheme.bodyMedium),
+                                child: Text(
+                                  'Views',
+                                  style: theme.textTheme.bodyMedium,
+                                ),
                               ),
                             ],
                           ),
@@ -142,14 +135,16 @@ class _DashboardPageState extends State<DashboardPage> {
                                   0.8,
                                   0.4,
                                   0.9,
-                                  0.6
+                                  0.6,
                                 ],
                               ),
                               child: Padding(
-                                padding:
-                                const EdgeInsets.symmetric(horizontal: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
                                 child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.end,
                                   mainAxisAlignment:
                                   MainAxisAlignment.spaceAround,
                                   children: [
@@ -169,22 +164,31 @@ class _DashboardPageState extends State<DashboardPage> {
                   const SizedBox(height: 16),
                   const SlideFadeTransitionWidget(
                     delay: Duration(milliseconds: 400),
-                    child: Wrap(
+                    child: Column(
                       spacing: 10,
-                      runSpacing: 10,
+                      crossAxisAlignment: .start,
                       children: [
-                        QuickActionButtonWidget(
-                          icon: Icons.person_outline,
-                          label: 'Manage Profile',
-                        ),
-                        QuickActionButtonWidget(
-                          icon: Icons.view_kanban_outlined,
-                          label: 'Manage Projects',
+                        Row(
+                          spacing: 10,
+
+                          children: [
+                            Expanded(
+                              child: QuickActionButtonWidget(
+                                icon: Icons.person_outline,
+                                label: 'Manage Profile',
+                              ),
+                            ),
+                            Expanded(
+                              child: QuickActionButtonWidget(
+                                icon: Icons.view_kanban_outlined,
+                                label: 'Manage Projects',
+                              ),
+                            ),
+                          ],
                         ),
                         QuickActionButtonWidget(
                           icon: Icons.phone_outlined,
                           label: 'UpdatenContact Info',
-                          fullWidth: true,
                         ),
                       ],
                     ),
@@ -196,7 +200,7 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ),
         ),
-         SizedBox(
+        SizedBox(
           height: 54,
           child: ElevatedButton.icon(
             onPressed: () {},
@@ -215,12 +219,9 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _chartLabel(BuildContext context, String text) {
     return Text(
       text,
-      style: Theme
-          .of(
+      style: Theme.of(
         context,
-      )
-          .textTheme
-          .labelSmall
-          ?.copyWith(color: Colors.grey.shade500),
+      ).textTheme.labelSmall?.copyWith(color: Colors.grey.shade500),
     );
-  }}
+  }
+}

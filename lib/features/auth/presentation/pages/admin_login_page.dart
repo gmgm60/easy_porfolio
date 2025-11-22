@@ -79,7 +79,7 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
       next.whenOrNull(
         data: (_) {
           ToastMessage.success(message: "Logged in successfully", ctx: context);
-          context.go('/Dashboard');
+          context.go('/dashboard');
         },
        );
     });

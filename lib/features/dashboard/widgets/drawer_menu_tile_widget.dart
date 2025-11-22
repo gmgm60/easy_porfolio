@@ -1,6 +1,6 @@
 import 'package:easy_porfolio/core/theme/extension/font_scaling_extension.dart';
 import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dart';
-import 'package:easy_porfolio/features/admin_home/data/models/drawer_item.dart';
+ import 'package:easy_porfolio/features/dashboard/data/models/drawer_item.dart';
 import 'package:flutter/material.dart';
 
 class DrawerMenuTileWidget extends StatefulWidget {
@@ -61,7 +61,7 @@ class _DrawerMenuTileWidgetState extends State<DrawerMenuTileWidget> {
               const SizedBox(width: 16),
               Text(
                 widget.data.label,
-                style: styles.bodyLargeTextStyle.copyWith(
+                style: styles.bodyMediumTextStyle.copyWith(
                   fontWeight: FontWeight.w600,
                   color: contentColor,
                 ),

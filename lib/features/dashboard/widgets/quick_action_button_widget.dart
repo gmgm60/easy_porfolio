@@ -7,7 +7,7 @@ class QuickActionButtonWidget extends StatelessWidget {
     super.key,
     required this.icon,
     required this.label,
-    this.fullWidth = false,
+    this.fullWidth = true,
   });
 
   final IconData icon;

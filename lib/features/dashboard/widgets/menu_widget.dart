@@ -1,13 +1,13 @@
 import 'package:easy_porfolio/core/widgets/animated_list_view_widget.dart';
 import 'package:easy_porfolio/core/widgets/theme_switcher_widget.dart';
-import 'package:easy_porfolio/features/admin_home/data/models/drawer_item.dart';
-import 'package:easy_porfolio/features/admin_home/presentation/widgets/drawer_menu_tile_widget.dart';
-import 'package:easy_porfolio/features/admin_home/presentation/widgets/menu_header_widget.dart';
-import 'package:easy_porfolio/features/admin_home/utils/drawer_item_type.dart';
+import 'package:easy_porfolio/features/dashboard/data/models/drawer_item.dart';
+ import 'package:easy_porfolio/features/dashboard/utils/drawer_item_type.dart';
+import 'package:easy_porfolio/features/dashboard/widgets/drawer_menu_tile_widget.dart';
+import 'package:easy_porfolio/features/dashboard/widgets/menu_header_widget.dart';
 import 'package:flutter/material.dart';
 
-class MenuPage extends StatefulWidget {
-  const MenuPage({
+class MenuWidget extends StatefulWidget {
+  const MenuWidget({
     super.key,
     required this.current,
     required this.onItemSelected,
@@ -17,10 +17,10 @@ class MenuPage extends StatefulWidget {
   final ValueChanged<DrawerItemType> onItemSelected;
 
   @override
-  State<MenuPage> createState() => _MenuPageState();
+  State<MenuWidget> createState() => _MenuWidgetState();
 }
 
-class _MenuPageState extends State<MenuPage> {
+class _MenuWidgetState extends State<MenuWidget> {
   final _items = const [
     DrawerItem(type: DrawerItemType.dashboard, icon: Icons.dashboard_outlined, label: 'Dashboard'),
     DrawerItem(type: DrawerItemType.projects, icon: Icons.view_kanban_outlined, label: 'Projects'),
@@ -37,7 +37,7 @@ class _MenuPageState extends State<MenuPage> {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 280), // A more typical menu width
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
