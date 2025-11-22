@@ -143,7 +143,7 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
                               ),
                               const SizedBox(height: 16),
                               AnimatedSizeVisibility(
-                                isVisible: formError != null,
+                                isVisible: formError != null && !isSubmitting,
                                 child: Padding(
                                   padding: const EdgeInsets.only(bottom: 8.0),
                                   child: ErrorBannerWidget(
