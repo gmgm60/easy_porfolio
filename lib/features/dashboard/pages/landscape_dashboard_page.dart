@@ -24,19 +24,17 @@ class _LandscapeDashboardPageState extends State<LandscapeDashboardPage> {
       body:  Row(
         spacing: 5,
         children: [
-             Expanded(
-
-              child: AnimatedSizeVisibility(
-                isVisible: _showMenu,
-                child: MenuWidget(
-                  current: currentItem,
-                  onItemSelected: (item) {
-                    final index = DrawerItemType.values.indexOf(item);
-                    if (index != -1) {
-                      widget.shell.goBranch(index);
-                    }
-                  },
-                ),
+          if (_showMenu)
+            SizedBox(
+                    width: 260,
+              child: MenuWidget(
+                current: currentItem,
+                onItemSelected: (item) {
+                  final index = DrawerItemType.values.indexOf(item);
+                  if (index != -1) {
+                    widget.shell.goBranch(index);
+                  }
+                },
               ),
             ),
           const VerticalDivider(width: 1, thickness: 1),

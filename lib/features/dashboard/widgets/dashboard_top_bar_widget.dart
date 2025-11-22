@@ -20,7 +20,7 @@ class DashboardTopBarWidget extends StatelessWidget {
         child: Icon(Icons.person_outline, size: 23.dp(context)),
       ),
       leading:         IconButton(
-          onPressed: () => ZoomDrawer.of(context)?.toggle(),
+          onPressed:onPressedMenu,
           icon: Icon(Icons.menu_sharp, size: 30.dp(context)),
         ),
         title: Text(
