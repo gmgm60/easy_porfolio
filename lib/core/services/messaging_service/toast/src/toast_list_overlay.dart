@@ -112,7 +112,9 @@ class ToastListOverlayState<T> extends State<ToastListOverlay<T>> {
         countdownTimer = Timer.periodic(const Duration(milliseconds: 500), (
           timer,
         ) {
-          if (_listItemNotifier.listItem.isEmpty) timer.cancel();
+          if (_listItemNotifier.listItem.isEmpty) {
+            timer.cancel();
+          }
 
           final currentTime = DateTime.now().millisecondsSinceEpoch;
 
@@ -120,7 +122,9 @@ class ToastListOverlayState<T> extends State<ToastListOverlay<T>> {
             final difference = currentTime - time.time;
             final maxDuration = widget.timeoutDuration.inMilliseconds;
 
-            if (difference >= maxDuration) return true;
+            if (difference >= maxDuration) {
+              return true;
+            }
 
             return false;
           }).toList();
@@ -212,7 +216,9 @@ class ToastListOverlayState<T> extends State<ToastListOverlay<T>> {
   ) {
     final itemIndex = _listItemNotifier.listItem.indexOf(item);
 
-    if (itemIndex == -1) return;
+    if (itemIndex == -1) {
+      return;
+    }
 
     timerList.removeAt(itemIndex);
     _listItemNotifier.remove(itemIndex);
@@ -235,11 +241,10 @@ class ToastListOverlayState<T> extends State<ToastListOverlay<T>> {
 
 class _ToastListScope extends InheritedWidget {
   const _ToastListScope({
-    Key? key,
-    required Widget child,
+    super.key,
+    required super.child,
     required ToastListOverlayState toastListOverlayState,
-  }) : _toastListOverlayState = toastListOverlayState,
-       super(key: key, child: child);
+  }) : _toastListOverlayState = toastListOverlayState;
 
   final ToastListOverlayState _toastListOverlayState;
 

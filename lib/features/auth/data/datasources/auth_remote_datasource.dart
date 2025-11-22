@@ -25,7 +25,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
 
       return const Failure(InvalidCredentialsFailure());
-    } catch (e, st) {
+    } catch (e, _) {
        final failure = UnknownFailure(e.toString());
       return Failure(failure);
     }

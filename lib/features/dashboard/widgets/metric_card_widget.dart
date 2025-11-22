@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
 import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dart';
-import 'package:flutter/material.dart';
 
 class MetricCardWidget extends StatelessWidget {
   const MetricCardWidget({
