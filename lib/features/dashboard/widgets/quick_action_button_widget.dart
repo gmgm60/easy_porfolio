@@ -19,11 +19,9 @@ class QuickActionButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final styles = context.textStyles;
-    final totalWidth = getScreenSize(context).threshold;
+    final totalWidth = MediaQuery.sizeOf(context).width;
 
-    final width = fullWidth
-        ? double.infinity
-        : (totalWidth - 48) / 2; // rough layout
+    final width = fullWidth ? totalWidth : (totalWidth - 42) / 2; // rough layout
 
     final child = Container(
       width: width,

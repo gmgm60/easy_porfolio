@@ -32,9 +32,7 @@ class _DashboardPageState extends State<DashboardPage> {
           child: ScrollConfiguration(
             behavior: const SmoothNoBarScrollBehavior(),
             child: SingleChildScrollView(
-
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              physics: const BouncingScrollPhysics(
+               physics: const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics(),
               ),
               child: Column(
@@ -198,8 +196,7 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ),
         ),
-        // This button is now outside the scroll view and will be fixed at the bottom.
-        SizedBox(
+         SizedBox(
           height: 54,
           child: ElevatedButton.icon(
             onPressed: () {},
