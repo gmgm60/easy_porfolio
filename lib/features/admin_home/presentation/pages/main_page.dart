@@ -2,6 +2,7 @@ import 'package:easy_porfolio/features/admin_home/utils/drawer_item_type.dart';
 import 'package:easy_porfolio/features/dashboard/pages/dashborad_page.dart';
 import 'package:easy_porfolio/features/dashboard/widgets/dashboard_top_bar_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key, required this.current});
@@ -57,7 +58,7 @@ class _PlaceholderPage extends StatelessWidget {
     final theme = Theme.of(context);
     return Column(
       children: [
-        const DashboardTopBarWidget(),
+        DashboardTopBarWidget(onPressedMenu:()=>ZoomDrawer.of(context)?.toggle()),
         const SizedBox(height: 32),
         Expanded(
           child: Center(

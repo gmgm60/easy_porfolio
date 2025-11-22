@@ -4,7 +4,8 @@ import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 
 /// Top bar is public so other screens (placeholder pages) can reuse it.
 class DashboardTopBarWidget extends StatelessWidget {
-  const DashboardTopBarWidget({super.key});
+  final VoidCallback onPressedMenu;
+  const DashboardTopBarWidget({super.key, required this.onPressedMenu});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +15,7 @@ class DashboardTopBarWidget extends StatelessWidget {
       children: [
         IconButton(
           onPressed: () => ZoomDrawer.of(context)?.toggle(),
-          icon: const Icon(Icons.dashboard_customize_outlined),
+          icon: const Icon(Icons.menu_sharp),
         ),
         const SizedBox(width: 6),
         Expanded(
