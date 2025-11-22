@@ -14,16 +14,10 @@ class ProjectDetailsScreen extends ConsumerWidget {
     final project = ref.watch(projectDetailsProvider(projectId));
     final textTheme = Theme.of(context).textTheme;
 
-    if (project == null) {
-      return Scaffold(
-        appBar: AppBar(),
-        body: const Center(child: Text('Project not found')),
-      );
-    }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(project.title),
+        title: Text(project!.title),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

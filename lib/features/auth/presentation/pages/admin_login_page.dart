@@ -1,33 +1,31 @@
 import 'package:easy_porfolio/core/services/messaging_service/helper_message.dart';
-import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dart';
-import 'package:easy_porfolio/core/utils/validator.dart';
+ import 'package:easy_porfolio/core/utils/validator.dart';
 import 'package:easy_porfolio/core/widgets/animated_size_visibility.dart';
 import 'package:easy_porfolio/core/widgets/custom_animated_card.dart';
 import 'package:easy_porfolio/core/widgets/error_banner_widget.dart';
 import 'package:easy_porfolio/core/widgets/text_link_widget.dart';
+import 'package:easy_porfolio/features/auth/presentation/providers/admin_login_provider.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/admin_header_widget.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/auth_text_field_widget.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/label_field_widget.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/passord_field_widget.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/primary_button_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class AdminLoginPage extends StatefulWidget {
+class AdminLoginPage extends ConsumerStatefulWidget {
   const AdminLoginPage({super.key});
 
   @override
-  State<AdminLoginPage> createState() => _AdminLoginPageState();
+  ConsumerState<AdminLoginPage> createState() => _AdminLoginPageState();
 }
 
-class _AdminLoginPageState extends State<AdminLoginPage>
+class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
-
-  String? _formError;
-  bool _isSubmitting = false;
 
   late final AnimationController _controller;
   late final Animation<double> _fade;
@@ -48,6 +46,8 @@ class _AdminLoginPageState extends State<AdminLoginPage>
 
     // start entrance animation
     _controller.forward();
+
+
   }
 
   @override
@@ -59,45 +59,34 @@ class _AdminLoginPageState extends State<AdminLoginPage>
   }
 
   Future<void> _submit() async {
+    // Unfocus to hide keyboard before submitting
+    FocusScope.of(context).unfocus();
+
     final form = _formKey.currentState;
-    if (form == null) {
+    if (form == null || !form.validate()) {
       return;
     }
 
-    if (!form.validate()) {
-      return;
-    }
-
-    setState(() => _isSubmitting = true);
-
-    await Future<void>.delayed(const Duration(milliseconds: 900));
-
-    final email = _emailCtrl.text.trim();
-    final password = _passwordCtrl.text;
-
-    if (email == "admin@example.com" && password == "123456") {
-      if (!mounted) {
-        return;
-      }
-
-      ToastMessage.success(message: "Logged in successfully", ctx: context);
-      context.go('/Dashboard');
-      // Navigate to dashboard here
-    } else {
-      setState(() {
-        _formError =
-            "We couldn't find an account with those credentials. Double-check your email and password.";
-      });
-    }
-
-    if (mounted) {
-      setState(() => _isSubmitting = false);
-    }
+    await ref
+        .read(adminLoginProvider.notifier)
+        .login(email: _emailCtrl.text.trim(), password: _passwordCtrl.text);
   }
 
   @override
   Widget build(BuildContext context) {
-    final gap = context.spacingTokens;
+    // --- Side effects: toast + navigation ---
+    ref.listen<AsyncValue<void>>(adminLoginProvider, (prev, next) {
+      next.whenOrNull(
+        data: (_) {
+          ToastMessage.success(message: "Logged in successfully", ctx: context);
+          context.go('/Dashboard');
+        },
+       );
+    });
+
+    final isSubmitting = ref.watch(adminLoginProvider.select((state) => state.isLoading));
+     final formError = ref.watch(adminLoginProvider.select((state) => state.error));
+
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
@@ -149,24 +138,24 @@ class _AdminLoginPageState extends State<AdminLoginPage>
                                 alignment: Alignment.centerRight,
                                 child: TextLinkWidget(
                                   text: "Forgot Password?",
-                                  onPressed: _isSubmitting ? null : () {},
+                                  onPressed: isSubmitting ? null : () {},
                                 ),
                               ),
                               const SizedBox(height: 16),
                               AnimatedSizeVisibility(
-                                isVisible: _formError != null,
+                                isVisible: formError != null,
                                 child: Padding(
                                   padding: const EdgeInsets.only(bottom: 8.0),
                                   child: ErrorBannerWidget(
-                                    message: _formError ?? '',
+                                    message: formError.toString(),
                                   ),
                                 ),
                               ),
                               const SizedBox(height: 8),
                               PrimaryButtonWidget(
                                 label: "Login",
-                                isLoading: _isSubmitting,
-                                onPressed: _isSubmitting ? null : _submit,
+                                isLoading: isSubmitting,
+                                onPressed: isSubmitting ? null : _submit,
                               ),
                             ],
                           ),
