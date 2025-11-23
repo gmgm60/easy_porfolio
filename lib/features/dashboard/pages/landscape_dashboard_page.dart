@@ -1,6 +1,5 @@
- import 'package:easy_porfolio/core/widgets/animated_size_visibility.dart';
 import 'package:easy_porfolio/features/dashboard/utils/drawer_item_type.dart';
- import 'package:easy_porfolio/features/dashboard/widgets/dashboard_top_bar_widget.dart';
+import 'package:easy_porfolio/features/dashboard/widgets/dashboard_top_bar_widget.dart';
 import 'package:easy_porfolio/features/dashboard/widgets/menu_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -21,12 +20,12 @@ class _LandscapeDashboardPageState extends State<LandscapeDashboardPage> {
   Widget build(BuildContext context) {
     final currentItem = indexToDrawerItem(widget.shell.currentIndex);
     return Scaffold(
-      body:  Row(
+      body: Row(
         spacing: 5,
         children: [
           if (_showMenu)
             SizedBox(
-                    width: 260,
+              width: 260,
               child: MenuWidget(
                 current: currentItem,
                 onItemSelected: (item) {
@@ -39,21 +38,22 @@ class _LandscapeDashboardPageState extends State<LandscapeDashboardPage> {
             ),
           const VerticalDivider(width: 1, thickness: 1),
           Expanded(
-              flex: 3,
-              child: Padding(
-                padding: const .all(10.0),
-                child: Column(
-                  children: [
-                    DashboardTopBarWidget(
-                      onPressedMenu: () => setState(() {
-                        _showMenu = !_showMenu;
-                      }),
-                    ),
-                    const SizedBox(height: 16),
-                    Expanded(child: widget.shell),
-                  ],
-                ),
-              )),
+            flex: 3,
+            child: Padding(
+              padding: const .all(10.0),
+              child: Column(
+                children: [
+                  DashboardTopBarWidget(
+                    onPressedMenu: () => setState(() {
+                      _showMenu = !_showMenu;
+                    }),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(child: widget.shell),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

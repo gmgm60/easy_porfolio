@@ -1,7 +1,6 @@
 import 'package:easy_porfolio/core/theme/extension/font_scaling_extension.dart';
 import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 
 /// Top bar is public so other screens (placeholder pages) can reuse it.
 class DashboardTopBarWidget extends StatelessWidget {
