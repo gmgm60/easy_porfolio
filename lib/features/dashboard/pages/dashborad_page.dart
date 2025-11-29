@@ -117,13 +117,15 @@ class _DashboardPageState extends State<DashboardPage> {
       );
     } else {
       // For small screens, use a Column
-      return Column(
-        children: cards
-            .map((card) => Padding(
-          padding: const EdgeInsets.only(bottom: 12.0),
-          child: card,
-        ))
-            .toList(),
+      return Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Wrap(
+          runSpacing: 10,
+           spacing: 10,
+           children: cards
+              .map((card) => card)
+              .toList(),
+        ),
       );
     }
   }
@@ -154,7 +156,6 @@ class _DashboardPageState extends State<DashboardPage> {
               child: QuickActionButtonWidget(
                 icon: Icons.phone_outlined,
                 label: 'Update Contact Info',
-                fullWidth: true,
               ),
             ),
           ],

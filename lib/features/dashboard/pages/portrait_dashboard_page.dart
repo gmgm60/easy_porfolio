@@ -45,8 +45,12 @@ class _PortraitDashboardPageState extends State<PortraitDashboardPage> {
           padding: const .all(10.0),
           child: Column(
             children: [
-              DashboardTopBarWidget(
-                onPressedMenu: () => ZoomDrawer.of(context)?.toggle(),
+              Builder(
+                builder: (context) {
+                  return DashboardTopBarWidget(
+                    onPressedMenu: () => ZoomDrawer.of(context)?.toggle(),
+                  );
+                }
               ),
               const SizedBox(height: 16),
               Expanded(child: widget.shell),
