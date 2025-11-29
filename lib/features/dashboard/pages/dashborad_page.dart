@@ -140,7 +140,6 @@ class _DashboardPageState extends State<DashboardPage> {
               child: QuickActionButtonWidget(
                 icon: Icons.person_outline,
                 label: 'Manage Profile',
-                fullWidth: true, // Use fullWidth to fill the Expanded space
               ),
             ),
             SizedBox(width: 16),
@@ -148,7 +147,6 @@ class _DashboardPageState extends State<DashboardPage> {
               child: QuickActionButtonWidget(
                 icon: Icons.view_kanban_outlined,
                 label: 'Manage Projects',
-                fullWidth: true,
               ),
             ),
             SizedBox(width: 16),
@@ -191,7 +189,6 @@ class _DashboardPageState extends State<DashboardPage> {
             QuickActionButtonWidget(
               icon: Icons.phone_outlined,
               label: 'Update Contact Info',
-              fullWidth: true, // Full width for the single button
             ),
           ],
         ),

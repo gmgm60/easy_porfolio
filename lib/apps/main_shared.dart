@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:easy_porfolio/core/theme/app_theme.dart';
 import 'package:easy_porfolio/features/theme/data/datasources/theme_local_datasource.dart';
 import 'package:easy_porfolio/features/theme/presentation/providers/theme_provider.dart';
+import 'package:easy_porfolio/features/admin_projects/presentation/providers/admin_projects_providers.dart';
 
 Future<void> runSharedApp({
   required SharedPreferences sharedPreferences,
@@ -20,6 +21,7 @@ Future<void> runSharedApp({
         themeLocalDataSourceProvider.overrideWithValue(
           ThemeLocalDataSourceImpl(sharedPreferences: sharedPreferences),
         ),
+        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
       ],
       // Pass the specific router to the MyApp widget
       child: MyApp(title: title, router: router),

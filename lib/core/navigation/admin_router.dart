@@ -2,6 +2,7 @@
 import 'package:easy_porfolio/features/dashboard/pages/dashborad_page.dart';
 import 'package:easy_porfolio/features/dashboard/pages/placeholder_page.dart';
 import 'package:easy_porfolio/features/dashboard/pages/responsive_dashboard_scaffold.dart';
+import 'package:easy_porfolio/features/admin_projects/presentation/pages/admin_projects_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -37,8 +38,7 @@ final adminRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/Projects',
-              builder: (context, state) =>
-                  const PlaceholderPage(title: 'Projects'),
+              builder: (context, state) => const AdminProjectsPage(),
             ),
           ],
         ),

@@ -30,7 +30,7 @@ class PickedImageModel {
     }
     if (path != null) {
       final file = File(path!);
-      return await file.readAsBytes();
+      return file.readAsBytes();
     }
     throw Exception('No bytes and no path available for image $name');
   }
