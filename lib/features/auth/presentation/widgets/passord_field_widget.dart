@@ -1,5 +1,5 @@
-import 'package:easy_porfolio/features/auth/presentation/widgets/auth_text_field_widget.dart';
-import 'package:flutter/material.dart';
+import 'package:easy_porfolio/core/widgets/custom_text_form_field.dart';
+ import 'package:flutter/material.dart';
 
 class PasswordFieldWidget extends StatefulWidget {
   const PasswordFieldWidget({
@@ -20,11 +20,11 @@ class PasswordFieldWidgetState extends State<PasswordFieldWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return AuthTextFieldWidget(
+    return CustomTextFormField(
       controller: widget.controller,
       hintText: "Enter your password",
       validator: widget.validator,
-      prefixIcon: Icons.lock_outline,
+      prefixIcon: const Icon(Icons.lock_outline),
       obscureText: _obscure,
       suffixIcon: IconButton(
         tooltip: _obscure ? "Show password" : "Hide password",

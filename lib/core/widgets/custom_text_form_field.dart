@@ -1,3 +1,4 @@
+import 'package:easy_porfolio/features/auth/presentation/widgets/slide_fade_transition_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dart';
@@ -36,6 +37,8 @@ class CustomTextFormField extends StatelessWidget {
     this.fieldName,
     this.validationType,
     this.customValidationParams,
+    this.animationDelay = Duration.zero,
+
   });
 
   final TextEditingController? controller;
@@ -59,7 +62,7 @@ class CustomTextFormField extends StatelessWidget {
   final bool readOnly;
   final bool isRequired;
   final String? fieldName;
-  
+  final Duration animationDelay;
   /// Predefined validation types for common use cases
   final ValidationType? validationType;
   
@@ -94,70 +97,72 @@ class CustomTextFormField extends StatelessWidget {
       finalFormatters.add(FilteringTextInputFormatter.deny(RegExp(r'\n')));
     }
 
-    return TextFormField(
-      controller: controller,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      decoration: InputDecoration(
-        labelText: labelText,
-        hintText: hintText,
-        helperText: helperText,
-        prefixIcon: prefixIcon,
-        suffixIcon: suffixIcon,
-        enabled: enabled,
+    return SlideFadeTransitionWidget(
+      child: TextFormField(
+        controller: controller,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        decoration: InputDecoration(
+          labelText: labelText,
+          hintText: hintText,
+          helperText: helperText,
+          prefixIcon: prefixIcon,
+          suffixIcon: suffixIcon,
+          enabled: enabled,
 
-        border: OutlineInputBorder(
-          borderRadius: radius.all8,
-          borderSide: BorderSide(color: colors.textMuted.withValues(alpha: 0.3)),
+          border: OutlineInputBorder(
+            borderRadius: radius.all8,
+            borderSide: BorderSide(color: colors.textMuted.withValues(alpha: 0.3)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: radius.all8,
+            borderSide: BorderSide(color: colors.textMuted.withValues(alpha: 0.3)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: radius.all8,
+            borderSide: BorderSide(color: colors.primary, width: 2),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: radius.all8,
+            borderSide: BorderSide(color: colors.error),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: radius.all8,
+            borderSide: BorderSide(color: colors.error, width: 2),
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderRadius: radius.all8,
+            borderSide: BorderSide(color: colors.textMuted.withValues(alpha: 0.1)),
+          ),
+          labelStyle: textStyles.bodyMediumTextStyle,
+          hintStyle: textStyles.bodyMediumTextStyle.copyWith(
+            color: colors.textMuted,
+          ),
+          helperStyle: textStyles.bodySmallTextStyle.copyWith(
+            color: colors.textMuted,
+          ),
+          errorStyle: textStyles.bodySmallTextStyle.copyWith(
+            color: colors.error,
+          ),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: spacing.md,
+            vertical: spacing.md,
+          ),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: radius.all8,
-          borderSide: BorderSide(color: colors.textMuted.withValues(alpha: 0.3)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: radius.all8,
-          borderSide: BorderSide(color: colors.primary, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: radius.all8,
-          borderSide: BorderSide(color: colors.error),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: radius.all8,
-          borderSide: BorderSide(color: colors.error, width: 2),
-        ),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: radius.all8,
-          borderSide: BorderSide(color: colors.textMuted.withValues(alpha: 0.1)),
-        ),
-        labelStyle: textStyles.bodyMediumTextStyle,
-        hintStyle: textStyles.bodyMediumTextStyle.copyWith(
-          color: colors.textMuted,
-        ),
-        helperStyle: textStyles.bodySmallTextStyle.copyWith(
-          color: colors.textMuted,
-        ),
-        errorStyle: textStyles.bodySmallTextStyle.copyWith(
-          color: colors.error,
-        ),
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: spacing.md,
-          vertical: spacing.md,
-        ),
+        style: textStyles.bodyMediumTextStyle,
+        validator: finalValidator,
+        onChanged: onChanged,
+        onSaved: onSaved,
+        obscureText: obscureText,
+        maxLines: maxLines,
+        minLines: minLines,
+        maxLength: maxLength,
+        keyboardType: keyboardType,
+        textInputAction: textInputAction,
+        inputFormatters: finalFormatters.isEmpty ? null : finalFormatters,
+        autofocus: autofocus,
+        readOnly: readOnly,
+        enabled: enabled,
       ),
-      style: textStyles.bodyMediumTextStyle,
-      validator: finalValidator,
-      onChanged: onChanged,
-      onSaved: onSaved,
-      obscureText: obscureText,
-      maxLines: maxLines,
-      minLines: minLines,
-      maxLength: maxLength,
-      keyboardType: keyboardType,
-      textInputAction: textInputAction,
-      inputFormatters: finalFormatters.isEmpty ? null : finalFormatters,
-      autofocus: autofocus,
-      readOnly: readOnly,
-      enabled: enabled,
     );
   }
 

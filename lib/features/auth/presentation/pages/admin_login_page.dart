@@ -1,12 +1,12 @@
 import 'package:easy_porfolio/core/services/messaging_service/helper_message.dart';
- import 'package:easy_porfolio/core/utils/validator.dart';
+import 'package:easy_porfolio/core/utils/validator.dart';
 import 'package:easy_porfolio/core/widgets/animated_size_visibility.dart';
 import 'package:easy_porfolio/core/widgets/custom_animated_card.dart';
+import 'package:easy_porfolio/core/widgets/custom_text_form_field.dart';
 import 'package:easy_porfolio/core/widgets/error_banner_widget.dart';
 import 'package:easy_porfolio/core/widgets/text_link_widget.dart';
 import 'package:easy_porfolio/features/auth/presentation/providers/admin_login_provider.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/admin_header_widget.dart';
-import 'package:easy_porfolio/features/auth/presentation/widgets/auth_text_field_widget.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/label_field_widget.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/passord_field_widget.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/primary_button_widget.dart';
@@ -46,8 +46,6 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
 
     // start entrance animation
     _controller.forward();
-
-
   }
 
   @override
@@ -81,11 +79,15 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
           ToastMessage.success(message: "Logged in successfully", ctx: context);
           context.go('/dashboard');
         },
-       );
+      );
     });
 
-    final isSubmitting = ref.watch(adminLoginProvider.select((state) => state.isLoading));
-     final formError = ref.watch(adminLoginProvider.select((state) => state.error));
+    final isSubmitting = ref.watch(
+      adminLoginProvider.select((state) => state.isLoading),
+    );
+    final formError = ref.watch(
+      adminLoginProvider.select((state) => state.error),
+    );
 
     return Scaffold(
       body: SafeArea(
@@ -116,11 +118,11 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
                               const SizedBox(height: 32),
                               LabelFieldWidget(
                                 label: "Email",
-                                child: AuthTextFieldWidget(
+                                child: CustomTextFormField(
                                   controller: _emailCtrl,
                                   hintText: "Enter your email",
                                   keyboardType: TextInputType.emailAddress,
-                                  prefixIcon: Icons.mail_outline,
+                                  prefixIcon: const Icon(Icons.mail_outline),
                                   validator: Validators.validateEmail,
                                 ),
                               ),
