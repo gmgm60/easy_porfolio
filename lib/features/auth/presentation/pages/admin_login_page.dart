@@ -5,6 +5,7 @@ import 'package:easy_porfolio/core/widgets/custom_animated_card.dart';
 import 'package:easy_porfolio/core/widgets/custom_text_form_field.dart';
 import 'package:easy_porfolio/core/widgets/error_banner_widget.dart';
 import 'package:easy_porfolio/core/widgets/text_link_widget.dart';
+import 'package:easy_porfolio/features/auth/data/models/login_form_model.dart';
 import 'package:easy_porfolio/features/auth/presentation/providers/admin_login_provider.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/admin_header_widget.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/label_field_widget.dart';
@@ -24,8 +25,7 @@ class AdminLoginPage extends ConsumerStatefulWidget {
 class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  final _emailCtrl = TextEditingController();
-  final _passwordCtrl = TextEditingController();
+  LoginFormModel _formData = const LoginFormModel();
 
   late final AnimationController _controller;
   late final Animation<double> _fade;
@@ -51,8 +51,6 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
   @override
   void dispose() {
     _controller.dispose();
-    _emailCtrl.dispose();
-    _passwordCtrl.dispose();
     super.dispose();
   }
 
@@ -67,7 +65,7 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
 
     await ref
         .read(adminLoginProvider.notifier)
-        .login(email: _emailCtrl.text.trim(), password: _passwordCtrl.text);
+        .login(email: _formData.email.trim(), password: _formData.password);
   }
 
   @override
@@ -119,11 +117,16 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
                               LabelFieldWidget(
                                 label: "Email",
                                 child: CustomTextFormField(
-                                  controller: _emailCtrl,
+                                  value: _formData.email,
                                   hintText: "Enter your email",
                                   keyboardType: TextInputType.emailAddress,
                                   prefixIcon: const Icon(Icons.mail_outline),
                                   validator: Validators.validateEmail,
+                                  onChanged: (value) {
+                                    _formData = _formData.copyWith(
+                                      email: value,
+                                    );
+                                  },
                                 ),
                               ),
 
@@ -131,7 +134,12 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
                               LabelFieldWidget(
                                 label: "Password",
                                 child: PasswordFieldWidget(
-                                  controller: _passwordCtrl,
+                                  value: _formData.password,
+                                  onChanged: (value) {
+                                    _formData = _formData.copyWith(
+                                      password: value,
+                                    );
+                                  },
                                   validator: Validators.validatePassword,
                                 ),
                               ),

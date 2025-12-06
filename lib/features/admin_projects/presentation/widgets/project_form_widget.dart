@@ -1,11 +1,12 @@
- import 'dart:convert';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
- import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dart';
+import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dart';
 import 'package:easy_porfolio/core/utils/responsive_util.dart';
 import 'package:easy_porfolio/core/widgets/custom_text_form_field.dart';
 import 'package:easy_porfolio/core/widgets/multi_image_picker_widget.dart';
 import 'package:easy_porfolio/core/widgets/fade_scale_animation.dart';
+import 'package:easy_porfolio/features/admin_projects/data/models/project_form_model.dart';
 import 'package:easy_porfolio/features/admin_projects/domain/entities/admin_project.dart';
 import 'package:easy_porfolio/features/admin_projects/presentation/widgets/image_picker_widget.dart';
 
@@ -20,10 +21,11 @@ class ProjectFormWidget extends StatefulWidget {
 
   final AdminProject? project;
   final Function(
-      AdminProject project,
-      Uint8List? imageBytes,
-      List<Uint8List> screenshotBytes,
-      ) onSave;
+    AdminProject project,
+    Uint8List? imageBytes,
+    List<Uint8List> screenshotBytes,
+  )
+  onSave;
   final VoidCallback onCancel;
 
   @override
@@ -33,16 +35,9 @@ class ProjectFormWidget extends StatefulWidget {
 class _ProjectFormWidgetState extends State<ProjectFormWidget> {
   final _formKey = GlobalKey<FormState>();
 
-  late final TextEditingController _titleController;
-  late final TextEditingController _descriptionController;
-  late final TextEditingController _liveDemoUrlController;
-  late final TextEditingController _repositoryUrlController;
-  late final TextEditingController _technologiesController;
-
+  late ProjectFormModel _formData;
   String? _imageUrl;
   Uint8List? _imageBytes;
-  bool _isFeatured = false;
-  List<String> _technologies = [];
   List<PickedImageData> _screenshots = [];
   List<String> _existingScreenshotUrls = [];
 
@@ -51,17 +46,16 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
     super.initState();
     final project = widget.project;
 
-    _titleController = TextEditingController(text: project?.title ?? '');
-    _descriptionController = TextEditingController(text: project?.description ?? '');
-    _liveDemoUrlController = TextEditingController(text: project?.liveDemoUrl ?? '');
-    _repositoryUrlController = TextEditingController(text: project?.repositoryUrl ?? '');
-    _technologiesController = TextEditingController(
-      text: project?.technologies.join(', ') ?? '',
+    _formData = ProjectFormModel(
+      title: project?.title ?? '',
+      description: project?.description ?? '',
+      liveDemoUrl: project?.liveDemoUrl ?? '',
+      repositoryUrl: project?.repositoryUrl ?? '',
+      technologies: project?.technologies.join(', ') ?? '',
+      isFeatured: project?.isFeatured ?? false,
     );
 
     _imageUrl = project?.imageUrl;
-    _isFeatured = project?.isFeatured ?? false;
-    _technologies = List<String>.from(project?.technologies ?? []);
     _existingScreenshotUrls = List<String>.from(project?.screenshots ?? []);
 
     // Initialize screenshots with existing URLs
@@ -70,55 +64,43 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
         .toList();
   }
 
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    _liveDemoUrlController.dispose();
-    _repositoryUrlController.dispose();
-    _technologiesController.dispose();
-    super.dispose();
-  }
-
   void _handleSave() {
     final isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid) {
       return;
     }
 
-    _parseTechnologies();
+    final technologies = _parseTechnologies();
     final now = DateTime.now();
 
     final screenshotData = _buildScreenshotData();
 
     final project = AdminProject(
-      id: widget.project?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
-      title: _titleController.text.trim(),
-      description: _descriptionController.text.trim(),
+      id:
+          widget.project?.id ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
+      title: _formData.title.trim(),
+      description: _formData.description.trim(),
       imageUrl: _imageUrl ?? '',
-      isFeatured: _isFeatured,
-      technologies: _technologies,
-      liveDemoUrl: _liveDemoUrlController.text.trim().isEmpty
+      isFeatured: _formData.isFeatured,
+      technologies: technologies,
+      liveDemoUrl: _formData.liveDemoUrl.trim().isEmpty
           ? null
-          : _liveDemoUrlController.text.trim(),
-      repositoryUrl: _repositoryUrlController.text.trim().isEmpty
+          : _formData.liveDemoUrl.trim(),
+      repositoryUrl: _formData.repositoryUrl.trim().isEmpty
           ? null
-          : _repositoryUrlController.text.trim(),
+          : _formData.repositoryUrl.trim(),
       screenshots: screenshotData.urls,
       createdAt: widget.project?.createdAt ?? now,
       updatedAt: now,
     );
 
-    widget.onSave(
-      project,
-      _imageBytes,
-      screenshotData.bytes,
-    );
+    widget.onSave(project, _imageBytes, screenshotData.bytes);
   }
 
-  void _parseTechnologies() {
-    final text = _technologiesController.text.trim();
-    _technologies = text
+  List<String> _parseTechnologies() {
+    final text = _formData.technologies.trim();
+    return text
         .split(',')
         .map((t) => t.trim())
         .where((t) => t.isNotEmpty)
@@ -140,7 +122,8 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
     // Add new screenshots (data URLs + bytes)
     for (final screenshot in _screenshots) {
       if (screenshot.bytes != null) {
-        final dataUrl = 'data:image/jpeg;base64,${base64Encode(screenshot.bytes!)}';
+        final dataUrl =
+            'data:image/jpeg;base64,${base64Encode(screenshot.bytes!)}';
         screenshotUrls.add(dataUrl);
         screenshotBytesList.add(screenshot.bytes!);
       } else if (screenshot.url != null &&
@@ -149,10 +132,7 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
       }
     }
 
-    return _ScreenshotData(
-      urls: screenshotUrls,
-      bytes: screenshotBytesList,
-    );
+    return _ScreenshotData(urls: screenshotUrls, bytes: screenshotBytesList);
   }
 
   @override
@@ -182,18 +162,21 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
 
               // Title / Description / Technologies
               _ProjectMainFieldsSection(
-                titleController: _titleController,
-                descriptionController: _descriptionController,
-                technologiesController: _technologiesController,
-                onTechnologiesChanged: (_) => _parseTechnologies(),
+                formData: _formData,
+                onChanged: (updated) {
+                  _formData = updated;
+                 },
               ),
               SizedBox(height: spacing.md),
 
               // URLs
               _ProjectUrlsSection(
                 isMobile: isMobile,
-                liveDemoUrlController: _liveDemoUrlController,
-                repositoryUrlController: _repositoryUrlController,
+                formData: _formData,
+                onChanged: (updated) {
+                  _formData = updated;
+
+                },
               ),
               SizedBox(height: spacing.md),
 
@@ -212,11 +195,10 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
 
               // Featured Checkbox
               _ProjectFeaturedSection(
-                value: _isFeatured,
+                value: _formData.isFeatured,
                 onChanged: (value) {
-                  setState(() {
-                    _isFeatured = value ?? false;
-                  });
+                  _formData = _formData.copyWith(isFeatured: value ?? false);
+
                 },
               ),
               SizedBox(height: spacing.lg),
@@ -236,10 +218,7 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
 }
 
 class _ScreenshotData {
-  const _ScreenshotData({
-    required this.urls,
-    required this.bytes,
-  });
+  const _ScreenshotData({required this.urls, required this.bytes});
 
   final List<String> urls;
   final List<Uint8List> bytes;
@@ -248,35 +227,34 @@ class _ScreenshotData {
 /// Title, description, technologies section.
 class _ProjectMainFieldsSection extends StatelessWidget {
   const _ProjectMainFieldsSection({
-    required this.titleController,
-    required this.descriptionController,
-    required this.technologiesController,
-    required this.onTechnologiesChanged,
+    required this.formData,
+    required this.onChanged,
   });
 
-  final TextEditingController titleController;
-  final TextEditingController descriptionController;
-  final TextEditingController technologiesController;
-  final ValueChanged<String> onTechnologiesChanged;
+  final ProjectFormModel formData;
+  final ValueChanged<ProjectFormModel> onChanged;
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.spacingTokens;
 
     return Column(
-      crossAxisAlignment:  .stretch,
+      crossAxisAlignment: .stretch,
       spacing: spacing.sm,
       children: [
         CustomTextFormField(
-          controller: titleController,
+          value: formData.title,
           labelText: 'Title',
           validationType: ValidationType.name,
           fieldName: 'Title',
           isRequired: true,
           textInputAction: TextInputAction.next,
+          onChanged: (value) {
+            onChanged(formData.copyWith(title: value));
+          },
         ),
-         CustomTextFormField(
-          controller: descriptionController,
+        CustomTextFormField(
+          value: formData.description,
           labelText: 'Description',
           validationType: ValidationType.description,
           fieldName: 'Description',
@@ -284,14 +262,19 @@ class _ProjectMainFieldsSection extends StatelessWidget {
           maxLines: 4,
           minLines: 3,
           textInputAction: TextInputAction.next,
+          onChanged: (value) {
+            onChanged(formData.copyWith(description: value));
+          },
         ),
-         CustomTextFormField(
-          controller: technologiesController,
+        CustomTextFormField(
+          value: formData.technologies,
           labelText: 'Technologies',
           hintText: 'Flutter, Dart, Firebase',
           validationType: ValidationType.commaSeparatedList,
           fieldName: 'Technologies',
-           onChanged: onTechnologiesChanged,
+          onChanged: (value) {
+            onChanged(formData.copyWith(technologies: value));
+          },
           textInputAction: TextInputAction.next,
         ),
       ],
@@ -303,13 +286,13 @@ class _ProjectMainFieldsSection extends StatelessWidget {
 class _ProjectUrlsSection extends StatelessWidget {
   const _ProjectUrlsSection({
     required this.isMobile,
-    required this.liveDemoUrlController,
-    required this.repositoryUrlController,
+    required this.formData,
+    required this.onChanged,
   });
 
   final bool isMobile;
-  final TextEditingController liveDemoUrlController;
-  final TextEditingController repositoryUrlController;
+  final ProjectFormModel formData;
+  final ValueChanged<ProjectFormModel> onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -321,22 +304,28 @@ class _ProjectUrlsSection extends StatelessWidget {
         children: [
           Expanded(
             child: CustomTextFormField(
-              controller: liveDemoUrlController,
+              value: formData.liveDemoUrl,
               labelText: 'Live Demo URL',
               validationType: ValidationType.url,
               fieldName: 'Live Demo URL',
               keyboardType: TextInputType.url,
               textInputAction: TextInputAction.next,
+              onChanged: (value) {
+                onChanged(formData.copyWith(liveDemoUrl: value));
+              },
             ),
           ),
-           Expanded(
+          Expanded(
             child: CustomTextFormField(
-              controller: repositoryUrlController,
+              value: formData.repositoryUrl,
               labelText: 'Repository URL',
               validationType: ValidationType.url,
               fieldName: 'Repository URL',
               keyboardType: TextInputType.url,
               textInputAction: TextInputAction.done,
+              onChanged: (value) {
+                onChanged(formData.copyWith(repositoryUrl: value));
+              },
             ),
           ),
         ],
@@ -346,21 +335,27 @@ class _ProjectUrlsSection extends StatelessWidget {
     return Column(
       children: [
         CustomTextFormField(
-          controller: liveDemoUrlController,
+          value: formData.liveDemoUrl,
           labelText: 'Live Demo URL',
           validationType: ValidationType.url,
           fieldName: 'Live Demo URL',
-           keyboardType: TextInputType.url,
+          keyboardType: TextInputType.url,
           textInputAction: TextInputAction.next,
+          onChanged: (value) {
+            onChanged(formData.copyWith(liveDemoUrl: value));
+          },
         ),
         SizedBox(height: spacing.md),
         CustomTextFormField(
-          controller: repositoryUrlController,
+          value: formData.repositoryUrl,
           labelText: 'Repository URL',
           validationType: ValidationType.url,
           fieldName: 'Repository URL',
-           keyboardType: TextInputType.url,
+          keyboardType: TextInputType.url,
           textInputAction: TextInputAction.done,
+          onChanged: (value) {
+            onChanged(formData.copyWith(repositoryUrl: value));
+          },
         ),
       ],
     );
@@ -369,10 +364,7 @@ class _ProjectUrlsSection extends StatelessWidget {
 
 /// Featured checkbox section.
 class _ProjectFeaturedSection extends StatelessWidget {
-  const _ProjectFeaturedSection({
-    required this.value,
-    required this.onChanged,
-  });
+  const _ProjectFeaturedSection({required this.value, required this.onChanged});
 
   final bool value;
   final ValueChanged<bool?> onChanged;
@@ -382,10 +374,7 @@ class _ProjectFeaturedSection extends StatelessWidget {
     final textStyles = context.textStyles;
 
     return CheckboxListTile(
-      title: Text(
-        'Featured Project',
-        style: textStyles.bodyMediumTextStyle,
-      ),
+      title: Text('Featured Project', style: textStyles.bodyMediumTextStyle),
       value: value,
       onChanged: onChanged,
       contentPadding: EdgeInsets.zero,
@@ -416,14 +405,11 @@ class _ProjectActionsSection extends StatelessWidget {
           Expanded(
             child: OutlinedButton(
               onPressed: onCancel,
-               child: const Text('Cancel'),
+              child: const Text('Cancel'),
             ),
           ),
-           Expanded(
-            child: ElevatedButton(
-              onPressed: onSave,
-               child: const Text('Save'),
-            ),
+          Expanded(
+            child: ElevatedButton(onPressed: onSave, child: const Text('Save')),
           ),
         ],
       );
@@ -434,16 +420,13 @@ class _ProjectActionsSection extends StatelessWidget {
       children: [
         SizedBox(
           width: double.infinity,
-          child: ElevatedButton(
-            onPressed: onSave,
-             child: const Text('Save'),
-          ),
+          child: ElevatedButton(onPressed: onSave, child: const Text('Save')),
         ),
-         SizedBox(
+        SizedBox(
           width: double.infinity,
           child: OutlinedButton(
             onPressed: onCancel,
-             child: const Text('Cancel'),
+            child: const Text('Cancel'),
           ),
         ),
       ],

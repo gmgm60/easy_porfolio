@@ -5,16 +5,18 @@ import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dar
 import 'package:easy_porfolio/core/validation/validators.dart';
 
 /// A reusable, themed TextFormField widget with built-in validation support.
-/// 
+///
 /// This widget provides:
 /// - Themed styling using theme extensions
 /// - Support for custom validators
 /// - Input formatters
 /// - Consistent appearance across the app
+/// - Support for both controller-based and value/onChange patterns
 class CustomTextFormField extends StatelessWidget {
   const CustomTextFormField({
     super.key,
     this.controller,
+    this.value,
     this.labelText,
     this.hintText,
     this.helperText,
@@ -38,10 +40,10 @@ class CustomTextFormField extends StatelessWidget {
     this.validationType,
     this.customValidationParams,
     this.animationDelay = Duration.zero,
-
   });
 
   final TextEditingController? controller;
+  final String? value;
   final String? labelText;
   final String? hintText;
   final String? helperText;
@@ -63,9 +65,10 @@ class CustomTextFormField extends StatelessWidget {
   final bool isRequired;
   final String? fieldName;
   final Duration animationDelay;
+
   /// Predefined validation types for common use cases
   final ValidationType? validationType;
-  
+
   /// Custom parameters for validation (e.g., minLength, maxLength)
   final Map<String, dynamic>? customValidationParams;
 
@@ -76,18 +79,22 @@ class CustomTextFormField extends StatelessWidget {
     final radius = context.radiusTokens;
     final textStyles = context.textStyles;
 
+
     // Build the validator function
     String? Function(String?)? finalValidator = validator;
-    
+
     if (validationType != null && validator == null) {
       finalValidator = _buildValidatorFromType();
     } else if (isRequired && validator == null) {
-      finalValidator = (value) => Validators.required(value, fieldName: fieldName ?? labelText ?? 'This field');
+      finalValidator = (value) => Validators.required(
+        value,
+        fieldName: fieldName ?? labelText ?? 'This field',
+      );
     }
 
     // Build input formatters
     final List<TextInputFormatter> finalFormatters = [];
-    
+
     if (inputFormatters != null) {
       finalFormatters.addAll(inputFormatters!);
     }
@@ -111,11 +118,15 @@ class CustomTextFormField extends StatelessWidget {
 
           border: OutlineInputBorder(
             borderRadius: radius.all8,
-            borderSide: BorderSide(color: colors.textMuted.withValues(alpha: 0.3)),
+            borderSide: BorderSide(
+              color: colors.textMuted.withValues(alpha: 0.3),
+            ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: radius.all8,
-            borderSide: BorderSide(color: colors.textMuted.withValues(alpha: 0.3)),
+            borderSide: BorderSide(
+              color: colors.textMuted.withValues(alpha: 0.3),
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: radius.all8,
@@ -131,7 +142,9 @@ class CustomTextFormField extends StatelessWidget {
           ),
           disabledBorder: OutlineInputBorder(
             borderRadius: radius.all8,
-            borderSide: BorderSide(color: colors.textMuted.withValues(alpha: 0.1)),
+            borderSide: BorderSide(
+              color: colors.textMuted.withValues(alpha: 0.1),
+            ),
           ),
           labelStyle: textStyles.bodyMediumTextStyle,
           hintStyle: textStyles.bodyMediumTextStyle.copyWith(
@@ -173,7 +186,7 @@ class CustomTextFormField extends StatelessWidget {
     switch (validationType!) {
       case ValidationType.required:
         return (value) => Validators.required(value, fieldName: name);
-      
+
       case ValidationType.name:
         return (value) => Validators.name(
           value,
@@ -182,21 +195,21 @@ class CustomTextFormField extends StatelessWidget {
           isRequired: isRequired,
           fieldName: name,
         );
-      
+
       case ValidationType.url:
         return (value) => Validators.url(
           value,
           isRequired: isRequired,
           fieldName: name,
         );
-      
+
       case ValidationType.email:
         return (value) => Validators.email(
           value,
           isRequired: isRequired,
           fieldName: name,
         );
-      
+
       case ValidationType.password:
         return (value) => Validators.password(
           value,
@@ -204,7 +217,7 @@ class CustomTextFormField extends StatelessWidget {
           isRequired: isRequired,
           fieldName: name,
         );
-      
+
       case ValidationType.description:
         return (value) => Validators.description(
           value,
@@ -213,7 +226,7 @@ class CustomTextFormField extends StatelessWidget {
           isRequired: isRequired,
           fieldName: name,
         );
-      
+
       case ValidationType.commaSeparatedList:
         return (value) => Validators.commaSeparatedList(
           value,
@@ -234,5 +247,3 @@ enum ValidationType {
   description,
   commaSeparatedList,
 }
-
-
