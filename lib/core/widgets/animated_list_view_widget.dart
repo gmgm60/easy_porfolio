@@ -16,7 +16,12 @@ class AnimatedListViewWidget<T> extends StatefulWidget {
 
   /// A builder function that creates the widget for each item.
   /// It receives the context, the item data, and the animation.
-  final Widget Function(BuildContext context, T item, Animation<double> animation) itemBuilder;
+  final Widget Function(
+    BuildContext context,
+    T item,
+    Animation<double> animation,
+  )
+  itemBuilder;
 
   /// The delay between each item's animation.
   final Duration staggerDelay;
@@ -28,50 +33,49 @@ class AnimatedListViewWidget<T> extends StatefulWidget {
   final Offset slideOffset;
 
   @override
-  State<AnimatedListViewWidget<T>> createState() => _AnimatedListViewWidgetState<T>();
+  State<AnimatedListViewWidget<T>> createState() =>
+      _AnimatedListViewWidgetState<T>();
 }
 
-class _AnimatedListViewWidgetState<T> extends State<AnimatedListViewWidget<T>>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
+class _AnimatedListViewWidgetState<T> extends State<AnimatedListViewWidget<T>> {
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
+  final List<T> _displayedItems = [];
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      // The total duration is based on the number of items and the stagger delay.
-      duration: widget.staggerDelay * widget.items.length,
-    )..forward();
+    // Insert items with staggered delays to create animation effect
+    _insertItemsWithStagger();
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  void _insertItemsWithStagger() {
+    for (int i = 0; i < widget.items.length; i++) {
+      final index = i;
+      final item = widget.items[i];
+      Future.delayed(widget.staggerDelay * index, () {
+        if (mounted && index < widget.items.length) {
+          setState(() {
+            _displayedItems.add(item);
+          });
+          _listKey.currentState?.insertItem(
+            index,
+            duration: widget.animationDuration,
+          );
+        }
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: widget.items.length,
-      itemBuilder: (context, index) {
-        final item = widget.items[index];
+    return AnimatedList(
+      key: _listKey,
+      initialItemCount: _displayedItems.length,
+      itemBuilder: (context, index, animation) {
 
-        // Calculate the start and end time for this specific item's animation.
-        final double startTime = (widget.staggerDelay.inMilliseconds * index) / _controller.duration!.inMilliseconds;
-        final double endTime = startTime + (widget.animationDuration.inMilliseconds / _controller.duration!.inMilliseconds);
+        final item = _displayedItems[index];
 
-        final animation = CurvedAnimation(
-          parent: _controller,
-          curve: Interval(
-            startTime,
-            endTime > 1.0 ? 1.0 : endTime, // Ensure endTime doesn't exceed 1.0
-            curve: Curves.easeOutCubic,
-          ),
-        );
 
-        // Use the provided itemBuilder to build the final widget.
         return widget.itemBuilder(context, item, animation);
       },
     );
