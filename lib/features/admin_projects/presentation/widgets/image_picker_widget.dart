@@ -9,7 +9,6 @@ import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dar
 import 'package:easy_porfolio/core/services/messaging_service/helper_message.dart';
 
 /// Widget for picking and displaying an image.
-typedef ImagePickedCallback = void Function(String imageUrl, Uint8List? bytes);
 
 class ImagePickerWidget extends StatefulWidget {
   const ImagePickerWidget({

@@ -44,8 +44,7 @@ class _AnimatedListViewWidgetState<T> extends State<AnimatedListViewWidget<T>> {
   @override
   void initState() {
     super.initState();
-    // Insert items with staggered delays to create animation effect
-    _insertItemsWithStagger();
+     _insertItemsWithStagger();
   }
 
   void _insertItemsWithStagger() {

@@ -1,69 +1,48 @@
- import 'package:easy_porfolio/core/services/image_services/src/core/logging/image_logger.dart';
-import 'package:easy_porfolio/core/services/image_services/src/core/models/picked_image_model.dart';
-import 'package:easy_porfolio/core/services/image_services/src/features/picking/image_picker.dart';
-import 'package:image_picker/image_picker.dart' as pkg;
+import 'package:easy_porfolio/core/logging/app_logger.dart';
+import 'package:easy_porfolio/core/services/image_services/src/core/models/picked_image.dart';
+import 'package:easy_porfolio/core/services/image_services/src/features/picking/image_picker_service.dart';
+import 'package:image_picker/image_picker.dart';
 
-class AdaptiveImagePicker implements ImagePickerDelegate {
-  final pkg.ImagePicker _picker;
-  final ImageLogger _log;
+class AdaptiveImagePicker implements ImagePickerServices {
+  final ImagePicker _picker;
+  final AppLogger _log;
 
-  AdaptiveImagePicker({pkg.ImagePicker? picker, ImageLogger? logger})
-    : _picker = picker ?? pkg.ImagePicker(),
-      _log = logger ?? const DebugImageLogger();
+  AdaptiveImagePicker({ImagePicker? picker, AppLogger? logger})
+    : _picker = picker ?? ImagePicker(),
+      _log = logger ?? const DebugLogger();
 
   @override
-  Future<PickedImageModel?> pickSingle({
-    required ImagePickSource source,
-  }) async {
-    final imgSource = source == ImagePickSource.camera
-        ? pkg.ImageSource.camera
-        : pkg.ImageSource.gallery;
-
-    _log.debug('Adaptive pickSingle(source=$source) starting...');
-    final pkg.XFile? file = await _picker.pickImage(source: imgSource);
+  Future<PickedImage?> pickSingle({ImageSource imgSource = ImageSource.gallery}) async {
+    final XFile? file = await _picker.pickImage(source: imgSource);
     if (file == null) {
       _log.info('Adaptive pickSingle() user canceled.');
       return null;
     }
 
     final bytes = await file.readAsBytes();
-    final model = PickedImageModel(
-      name: file.name,
-      path: file.path,
-      bytes: bytes,
-    );
+    final model = PickedImage(name: file.name, path: file.path, bytes: bytes);
 
     _log.info('Adaptive pickSingle() got ${model.name}');
     return model;
   }
 
   @override
-  Future<List<PickedImageModel>> pickMultiple({
-    required ImagePickSource source,
+  Future<List<PickedImage>> pickMultiple({
+    ImageSource imgSource = ImageSource.gallery,
   }) async {
-    _log.debug('Adaptive pickMultiple(source=$source) starting...');
-
-    if (source == ImagePickSource.camera) {
-      _log.warning(
-        'Camera multi-pick not supported. Falling back to single pick.',
-      );
-      final single = await pickSingle(source: source);
-      return single == null ? <PickedImageModel>[] : [single];
-    }
-
     final files = await _picker.pickMultiImage();
     if (files.isEmpty) {
       _log.info('Adaptive pickMultiple() user canceled / no images.');
-      return <PickedImageModel>[];
+      return <PickedImage>[];
     }
 
-    final results = <PickedImageModel>[];
+    final results = <PickedImage>[];
     for (final f in files) {
       final bytes = await f.readAsBytes();
-      results.add(PickedImageModel(name: f.name, path: f.path, bytes: bytes));
+      results.add(PickedImage(name: f.name, path: f.path, bytes: bytes));
     }
 
-    _log.info('Mobile pickMultiple() got count=${results.length}');
+    _log.info('Adaptive pickMultiple() got count=${results.length}');
     return results;
   }
 }

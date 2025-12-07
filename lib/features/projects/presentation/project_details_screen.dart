@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_porfolio/features/projects/data/projects_provider.dart';
@@ -7,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class ProjectDetailsScreen extends ConsumerWidget {
   final String projectId;
+
   const ProjectDetailsScreen({super.key, required this.projectId});
 
   @override
@@ -14,11 +14,15 @@ class ProjectDetailsScreen extends ConsumerWidget {
     final project = ref.watch(projectDetailsProvider(projectId));
     final textTheme = Theme.of(context).textTheme;
 
+    if (project == null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: const Center(child: Text('Project not found')),
+      );
+    }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(project!.title),
-      ),
+      appBar: AppBar(title: Text(project.title)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -35,7 +39,9 @@ class ProjectDetailsScreen extends ConsumerWidget {
             Wrap(
               spacing: 8.0,
               runSpacing: 8.0,
-              children: project.technologies.map((tech) => Chip(label: Text(tech))).toList(),
+              children: project.technologies
+                  .map((tech) => Chip(label: Text(tech)))
+                  .toList(),
             ),
             const SizedBox(height: 24),
             Text('Links', style: textTheme.displaySmall),
@@ -53,6 +59,7 @@ class ProjectDetailsScreen extends ConsumerWidget {
 
 class _ScreenshotsCarousel extends StatelessWidget {
   final List<String> screenshots;
+
   const _ScreenshotsCarousel({required this.screenshots});
 
   @override

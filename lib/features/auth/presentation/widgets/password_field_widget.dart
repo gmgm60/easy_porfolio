@@ -1,5 +1,5 @@
-import 'package:easy_porfolio/core/widgets/custom_text_form_field.dart';
-import 'package:flutter/material.dart';
+import 'package:easy_porfolio/core/widgets/app_text_field.dart';
+ import 'package:flutter/material.dart';
 
 class PasswordFieldWidget extends StatefulWidget {
   const PasswordFieldWidget({
@@ -27,7 +27,7 @@ class PasswordFieldWidgetState extends State<PasswordFieldWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomTextFormField(
+    return AppTextField(
       controller: widget.controller,
       value: widget.value,
       hintText: "Enter your password",

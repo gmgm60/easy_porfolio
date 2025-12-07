@@ -1,23 +1,23 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-class PickedImageModel {
+class PickedImage {
   final String name;
   final String? path; // null on web sometimes
   final Uint8List? bytes;
 
-  const PickedImageModel({
+  const PickedImage({
     required this.name,
     required this.path,
     this.bytes,
   });
 
-  PickedImageModel copyWith({
+  PickedImage copyWith({
     String? name,
     String? path,
     Uint8List? bytes,
   }) {
-    return PickedImageModel(
+    return PickedImage(
       name: name ?? this.name,
       path: path ?? this.path,
       bytes: bytes ?? this.bytes,

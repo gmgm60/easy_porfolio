@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-abstract class ImageLogger {
+abstract class AppLogger {
   void debug(String message);
   void info(String message);
   void warning(String message);
@@ -8,9 +8,9 @@ abstract class ImageLogger {
 }
 
 /// Default lightweight logger using debugPrint.
-class DebugImageLogger implements ImageLogger {
+class DebugLogger implements AppLogger {
   final String tag;
-  const DebugImageLogger({this.tag = 'ImageServices'});
+  const DebugLogger({this.tag = 'AppLogger'});
 
   @override
   void debug(String message) => debugPrint('[$tag][DEBUG] $message');

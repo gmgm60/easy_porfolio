@@ -1,15 +1,15 @@
 import 'package:easy_porfolio/core/services/messaging_service/helper_message.dart';
 import 'package:easy_porfolio/core/utils/validator.dart';
 import 'package:easy_porfolio/core/widgets/animated_size_visibility.dart';
+import 'package:easy_porfolio/core/widgets/app_text_field.dart';
 import 'package:easy_porfolio/core/widgets/custom_animated_card.dart';
-import 'package:easy_porfolio/core/widgets/custom_text_form_field.dart';
-import 'package:easy_porfolio/core/widgets/error_banner_widget.dart';
+ import 'package:easy_porfolio/core/widgets/error_banner_widget.dart';
 import 'package:easy_porfolio/core/widgets/text_link_widget.dart';
 import 'package:easy_porfolio/features/auth/data/models/login_form_model.dart';
 import 'package:easy_porfolio/features/auth/presentation/providers/admin_login_provider.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/admin_header_widget.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/label_field_widget.dart';
-import 'package:easy_porfolio/features/auth/presentation/widgets/passord_field_widget.dart';
+import 'package:easy_porfolio/features/auth/presentation/widgets/password_field_widget.dart';
 import 'package:easy_porfolio/features/auth/presentation/widgets/primary_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -116,7 +116,7 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
                               const SizedBox(height: 32),
                               LabelFieldWidget(
                                 label: "Email",
-                                child: CustomTextFormField(
+                                child: AppTextField(
                                   value: _formData.email,
                                   hintText: "Enter your email",
                                   keyboardType: TextInputType.emailAddress,

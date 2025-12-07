@@ -1,5 +1,4 @@
- enum CompressFormat { jpeg, png, webp }
-
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 class CompressOptions {
   final int quality; // 0..100
   final int? minWidth;
