@@ -1,24 +1,12 @@
-import 'dart:typed_data';
+import 'package:easy_porfolio/core/services/image_services/src/core/models/picked_image.dart';
+import 'package:easy_porfolio/core/services/image_services/src/features/compressing/image_compress_service.dart';
+import 'package:easy_porfolio/core/services/image_services/src/features/compressing/mobile_image_compress.dart';
+import 'package:easy_porfolio/core/services/image_services/src/features/picking/adaptive_image_picker.dart';
+import 'package:easy_porfolio/core/services/image_services/src/features/picking/image_picker_service.dart';
 import 'package:flutter/material.dart';
-import 'package:easy_porfolio/core/services/image_services/image_services.dart';
 import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dart';
 import 'package:easy_porfolio/core/widgets/fade_scale_animation.dart';
 import 'package:easy_porfolio/core/services/messaging_service/helper_message.dart';
-
-/// Model to represent a picked image with its data.
-class PickedImageData {
-  final String? url;
-  final Uint8List? bytes;
-  final String id;
-
-  PickedImageData({
-    this.url,
-    this.bytes,
-    String? id,
-  }) : id = id ?? DateTime.now().millisecondsSinceEpoch.toString();
-
-  bool get hasData => url != null && url!.isNotEmpty || bytes != null;
-}
 
 /// Widget for picking and displaying multiple images.
 /// Supports adding, displaying, and deleting individual images.
@@ -33,18 +21,18 @@ class MultiImagePickerWidget extends StatefulWidget {
   });
 
   /// Callback when images are added or removed.
-  /// Returns a list of PickedImageData with either URL or bytes.
-  final Function(List<PickedImageData> images) onImagesChanged;
-  
+  /// Returns a list of PickedImage with either URL or bytes.
+  final Function(List<PickedImage> images) onImagesChanged;
+
   /// Initial images to display (URLs or data URLs).
   final List<String> initialImages;
-  
+
   /// Label for the image picker section.
   final String label;
-  
+
   /// Maximum number of images allowed (null for unlimited).
   final int? maxImages;
-  
+
   /// Whether to show delete buttons on images.
   final bool showDeleteButton;
 
@@ -53,17 +41,16 @@ class MultiImagePickerWidget extends StatefulWidget {
 }
 
 class _MultiImagePickerWidgetState extends State<MultiImagePickerWidget> {
-  final ImageServices _imageServices = ImageServices.createDefault();
-  final List<PickedImageData> _images = [];
+  final ImagePickerServices _imageServices = AdaptiveImagePicker();
+  final ImageCompressService _compress = ImageCompress();
+  final List<PickedImage> _images = [];
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     // Initialize with existing images
-    _images.addAll(
-      widget.initialImages.map((url) => PickedImageData(url: url)),
-    );
+    _images.addAll(widget.initialImages.map((url) => PickedImage.fromUrl(url)));
     // Notify parent of initial state
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_images.isNotEmpty) {
@@ -79,8 +66,8 @@ class _MultiImagePickerWidgetState extends State<MultiImagePickerWidget> {
 
     setState(() => _isLoading = true);
     try {
-      final pickedImages = await _imageServices.picker.pickMultiImage(context);
-      
+      final pickedImages = await _imageServices.pickMultiple();
+
       if (pickedImages.isEmpty) {
         return;
       }
@@ -91,21 +78,17 @@ class _MultiImagePickerWidgetState extends State<MultiImagePickerWidget> {
         }
 
         // Compress the image
-        final compressed = await _imageServices.processor.compress(pickedImage);
-        final bytes = await compressed.readBytes();
+        final compressed = await _compress.compress(pickedImage);
 
         setState(() {
-          _images.add(PickedImageData(bytes: bytes));
+          _images.add(compressed);
         });
       }
 
       _notifyChange();
     } catch (e) {
       if (mounted) {
-        ToastMessage.failed(
-          message: 'Error picking images: $e',
-          ctx: context,
-        );
+        ToastMessage.failed(message: 'Error picking images: $e', ctx: context);
       }
     } finally {
       if (mounted) {
@@ -132,7 +115,8 @@ class _MultiImagePickerWidgetState extends State<MultiImagePickerWidget> {
     final radius = context.radiusTokens;
     final textStyles = context.textStyles;
 
-    final canAddMore = widget.maxImages == null || _images.length < widget.maxImages!;
+    final canAddMore =
+        widget.maxImages == null || _images.length < widget.maxImages!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,10 +124,7 @@ class _MultiImagePickerWidgetState extends State<MultiImagePickerWidget> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              widget.label,
-              style: textStyles.bodyMediumTextStyle,
-            ),
+            Text(widget.label, style: textStyles.bodyMediumTextStyle),
             if (widget.maxImages != null)
               Text(
                 '${_images.length}/${widget.maxImages}',
@@ -154,18 +135,18 @@ class _MultiImagePickerWidgetState extends State<MultiImagePickerWidget> {
           ],
         ),
         SizedBox(height: spacing.sm),
-        
+
         // Images Grid
         if (_images.isNotEmpty)
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-               crossAxisCount: 3,
-               crossAxisSpacing: spacing.sm,
-               mainAxisSpacing: spacing.sm,
-               childAspectRatio: 1.0,
-             ),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: spacing.sm,
+              mainAxisSpacing: spacing.sm,
+              childAspectRatio: 1.0,
+            ),
             itemCount: _images.length,
             itemBuilder: (context, index) {
               return _buildImageItem(context, index, colors, radius, spacing);
@@ -187,22 +168,20 @@ class _MultiImagePickerWidgetState extends State<MultiImagePickerWidget> {
                   borderRadius: radius.all12,
                   border: Border.all(
                     color: colors.textMuted.withValues(alpha: 0.3),
-                   ),
+                  ),
                 ),
                 child: _isLoading
                     ? Center(
-                        child: CircularProgressIndicator(
-                          color: colors.primary,
-                        ),
+                        child: CircularProgressIndicator(color: colors.primary),
                       )
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                         children: [
-                           Icon(
-                             Icons.add_photo_alternate_outlined,
-                             size: spacing.lg,
-                             color: colors.textMuted,
-                           ),
+                        children: [
+                          Icon(
+                            Icons.add_photo_alternate_outlined,
+                            size: spacing.lg,
+                            color: colors.textMuted,
+                          ),
                           SizedBox(height: spacing.xs),
                           Text(
                             'Add Images',
@@ -239,39 +218,39 @@ class _MultiImagePickerWidgetState extends State<MultiImagePickerWidget> {
                   width: double.infinity,
                   height: double.infinity,
                 )
-              : image.url != null && image.url!.isNotEmpty
-                  ? Image.network(
-                      image.url!,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                       errorBuilder: (context, error, stackTrace) {
-                         return _buildPlaceholder(colors, radius, spacing);
-                       },
-                     )
-                   : _buildPlaceholder(colors, radius, spacing),
+              : image.path != null && image.path!.isNotEmpty
+              ? Image.network(
+                  image.path!,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                  errorBuilder: (context, error, stackTrace) {
+                    return _buildPlaceholder(colors, radius, spacing);
+                  },
+                )
+              : _buildPlaceholder(colors, radius, spacing),
         ),
-         if (widget.showDeleteButton)
-           Positioned(
-             top: spacing.xs / 2,
-             right: spacing.xs / 2,
-             child: Material(
-               color: colors.error,
-               borderRadius: radius.all4,
-               child: InkWell(
-                 onTap: () => _removeImage(index),
-                 borderRadius: radius.all4,
-                 child: Container(
-                   padding: EdgeInsets.all(spacing.xs / 2),
-                   child: Icon(
-                     Icons.close,
-                     size: spacing.md,
-                     color: colors.onError,
-                   ),
-                 ),
-               ),
-             ),
-           ),
+        if (widget.showDeleteButton)
+          Positioned(
+            top: spacing.xs / 2,
+            right: spacing.xs / 2,
+            child: Material(
+              color: colors.error,
+              borderRadius: radius.all4,
+              child: InkWell(
+                onTap: () => _removeImage(index),
+                borderRadius: radius.all4,
+                child: Container(
+                  padding: EdgeInsets.all(spacing.xs / 2),
+                  child: Icon(
+                    Icons.close,
+                    size: spacing.md,
+                    color: colors.onError,
+                  ),
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -289,4 +268,3 @@ class _MultiImagePickerWidgetState extends State<MultiImagePickerWidget> {
     );
   }
 }
-

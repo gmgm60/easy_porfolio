@@ -6,17 +6,9 @@ class PickedImage {
   final String? path; // null on web sometimes
   final Uint8List? bytes;
 
-  const PickedImage({
-    required this.name,
-    required this.path,
-    this.bytes,
-  });
+  const PickedImage({required this.name, required this.path, this.bytes});
 
-  PickedImage copyWith({
-    String? name,
-    String? path,
-    Uint8List? bytes,
-  }) {
+  PickedImage copyWith({String? name, String? path, Uint8List? bytes}) {
     return PickedImage(
       name: name ?? this.name,
       path: path ?? this.path,
@@ -33,6 +25,25 @@ class PickedImage {
       return file.readAsBytes();
     }
     throw Exception('No bytes and no path available for image $name');
+  }
+
+  /// Creates a PickedImage from a URL string.
+  /// Used when displaying existing images from a server.
+  factory PickedImage.fromUrl(String url) {
+    return PickedImage(name: _extractNameFromUrl(url), path: url);
+  }
+
+  /// Extracts a filename from a URL for display purposes.
+  static String _extractNameFromUrl(String url) {
+    try {
+      final uri = Uri.parse(url);
+      final segments = uri.pathSegments;
+      if (segments.isNotEmpty) {
+        return segments.last;
+      }
+    } catch (_) {
+     }
+    return 'image.jpg';
   }
 
   @override

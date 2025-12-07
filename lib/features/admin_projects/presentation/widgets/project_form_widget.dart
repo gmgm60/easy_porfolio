@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'package:easy_porfolio/core/services/image_services/src/core/models/picked_image.dart';
+import 'package:easy_porfolio/core/widgets/app_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dart';
 import 'package:easy_porfolio/core/utils/responsive_util.dart';
-import 'package:easy_porfolio/core/widgets/custom_text_form_field.dart';
 import 'package:easy_porfolio/core/widgets/multi_image_picker_widget.dart';
 import 'package:easy_porfolio/core/widgets/fade_scale_animation.dart';
 import 'package:easy_porfolio/features/admin_projects/data/models/project_form_model.dart';
@@ -38,7 +39,7 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
   late ProjectFormModel _formData;
   String? _imageUrl;
   Uint8List? _imageBytes;
-  List<PickedImageData> _screenshots = [];
+  List<PickedImage> _screenshots = [];
   List<String> _existingScreenshotUrls = [];
 
   @override
@@ -60,7 +61,7 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
 
     // Initialize screenshots with existing URLs
     _screenshots = _existingScreenshotUrls
-        .map((url) => PickedImageData(url: url))
+        .map(PickedImage.fromUrl)
         .toList();
   }
 
@@ -113,7 +114,7 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
 
     // Keep existing URLs that are still present
     for (final url in _existingScreenshotUrls) {
-      final stillExists = _screenshots.any((img) => img.url == url);
+      final stillExists = _screenshots.any((img) => img.path == url);
       if (stillExists) {
         screenshotUrls.add(url);
       }
@@ -126,9 +127,9 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
             'data:image/jpeg;base64,${base64Encode(screenshot.bytes!)}';
         screenshotUrls.add(dataUrl);
         screenshotBytesList.add(screenshot.bytes!);
-      } else if (screenshot.url != null &&
-          !_existingScreenshotUrls.contains(screenshot.url)) {
-        screenshotUrls.add(screenshot.url!);
+      } else if (screenshot.path != null &&
+          !_existingScreenshotUrls.contains(screenshot.path!)) {
+        screenshotUrls.add(screenshot.path!);
       }
     }
 
@@ -151,10 +152,10 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
               // Main Project Image Picker
               ImagePickerWidget(
                 initialImageUrl: _imageUrl,
-                onImagePicked: (url, bytes) {
+                onImagePicked: (PickedImage image) {
                   setState(() {
-                    _imageUrl = url;
-                    _imageBytes = bytes;
+                    _imageUrl = image.path;
+                    _imageBytes = image.bytes;
                   });
                 },
               ),
@@ -165,7 +166,7 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
                 formData: _formData,
                 onChanged: (updated) {
                   _formData = updated;
-                 },
+                },
               ),
               SizedBox(height: spacing.md),
 
@@ -175,7 +176,6 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
                 formData: _formData,
                 onChanged: (updated) {
                   _formData = updated;
-
                 },
               ),
               SizedBox(height: spacing.md),
@@ -198,7 +198,6 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
                 value: _formData.isFeatured,
                 onChanged: (value) {
                   _formData = _formData.copyWith(isFeatured: value ?? false);
-
                 },
               ),
               SizedBox(height: spacing.lg),
@@ -242,7 +241,7 @@ class _ProjectMainFieldsSection extends StatelessWidget {
       crossAxisAlignment: .stretch,
       spacing: spacing.sm,
       children: [
-        CustomTextFormField(
+        AppTextField(
           value: formData.title,
           labelText: 'Title',
           validationType: ValidationType.name,
@@ -253,7 +252,7 @@ class _ProjectMainFieldsSection extends StatelessWidget {
             onChanged(formData.copyWith(title: value));
           },
         ),
-        CustomTextFormField(
+        AppTextField(
           value: formData.description,
           labelText: 'Description',
           validationType: ValidationType.description,
@@ -266,7 +265,7 @@ class _ProjectMainFieldsSection extends StatelessWidget {
             onChanged(formData.copyWith(description: value));
           },
         ),
-        CustomTextFormField(
+        AppTextField(
           value: formData.technologies,
           labelText: 'Technologies',
           hintText: 'Flutter, Dart, Firebase',
@@ -303,7 +302,7 @@ class _ProjectUrlsSection extends StatelessWidget {
         spacing: spacing.sm,
         children: [
           Expanded(
-            child: CustomTextFormField(
+            child: AppTextField(
               value: formData.liveDemoUrl,
               labelText: 'Live Demo URL',
               validationType: ValidationType.url,
@@ -316,7 +315,7 @@ class _ProjectUrlsSection extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: CustomTextFormField(
+            child: AppTextField(
               value: formData.repositoryUrl,
               labelText: 'Repository URL',
               validationType: ValidationType.url,
@@ -334,7 +333,7 @@ class _ProjectUrlsSection extends StatelessWidget {
 
     return Column(
       children: [
-        CustomTextFormField(
+        AppTextField(
           value: formData.liveDemoUrl,
           labelText: 'Live Demo URL',
           validationType: ValidationType.url,
@@ -346,7 +345,7 @@ class _ProjectUrlsSection extends StatelessWidget {
           },
         ),
         SizedBox(height: spacing.md),
-        CustomTextFormField(
+        AppTextField(
           value: formData.repositoryUrl,
           labelText: 'Repository URL',
           validationType: ValidationType.url,
