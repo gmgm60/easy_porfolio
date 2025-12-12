@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'dart:convert';
- import 'package:easy_porfolio/features/admin_projects/presentation/widgets/delete_project_dialog.dart';
+import 'package:easy_porfolio/features/admin_projects/presentation/widgets/delete_project_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dart';
@@ -37,7 +37,7 @@ class _AdminProjectsPageState extends ConsumerState<AdminProjectsPage> {
         children: [
           Expanded(
             child: Column(
-              crossAxisAlignment:  .stretch,
+              crossAxisAlignment: .stretch,
               children: [
                 _AdminProjectsHeader(
                   projectCount: state.projects.length,
@@ -74,6 +74,7 @@ class _AdminProjectsPageState extends ConsumerState<AdminProjectsPage> {
 
   Widget _buildForm(BuildContext context) {
     return ProjectFormWidget(
+      key: ValueKey(_editingProject?.id ?? 'new'),
       project: _editingProject,
       onSave: (project, imageBytes, screenshotBytes) async {
         await _handleSave(project, imageBytes, screenshotBytes);
@@ -92,11 +93,7 @@ class _AdminProjectsPageState extends ConsumerState<AdminProjectsPage> {
     final spacing = context.spacingTokens;
 
     if (state.isLoading) {
-      return Center(
-        child: CircularProgressIndicator(
-          color: colors.primary,
-        ),
-      );
+      return Center(child: CircularProgressIndicator(color: colors.primary));
     }
 
     if (state.error != null) {
@@ -106,9 +103,7 @@ class _AdminProjectsPageState extends ConsumerState<AdminProjectsPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ErrorBannerWidget(
-                message: state.error!,
-              ),
+              ErrorBannerWidget(message: state.error!),
               SizedBox(height: spacing.md),
               ElevatedButton(
                 onPressed: () {
@@ -140,19 +135,12 @@ class _AdminProjectsPageState extends ConsumerState<AdminProjectsPage> {
   }
 
   Future<void> _handleSave(
-      AdminProject project,
-      Uint8List? imageBytes,
-      List<Uint8List> screenshotBytes,
-      ) async {
-    // Convert image bytes to base64 for storage (in a real app, upload to server)
-    String imageUrl = project.imageUrl;
-    if (imageBytes != null) {
-      // For demo, we'll use data URL. In production, upload to cloud storage
-      imageUrl = 'data:image/jpeg;base64,${base64Encode(imageBytes)}';
-    }
-
-    // Screenshots are already converted to data URLs in the form widget
-    final projectToSave = project.copyWith(imageUrl: imageUrl);
+    AdminProject project,
+    Uint8List? imageBytes,
+    List<Uint8List> screenshotBytes,
+  ) async {
+    // Project already has base64 strings from form widget, use it directly
+    final projectToSave = project;
 
     final result = _editingProject == null
         ? await ref.read(createProjectUseCaseProvider).call(projectToSave)
@@ -160,24 +148,24 @@ class _AdminProjectsPageState extends ConsumerState<AdminProjectsPage> {
 
     result
         .onFailure((failure) {
-      ToastMessage.failed(
-        message: 'Error: ${failure.toString()}',
-        ctx: context,
-      );
-    })
+          ToastMessage.failed(
+            message: 'Error: ${failure.toString()}',
+            ctx: context,
+          );
+        })
         .onSuccess((_) {
-      ToastMessage.success(
-        message: _editingProject == null
-            ? 'Project created successfully'
-            : 'Project updated successfully',
-        ctx: context,
-      );
-      setState(() {
-        _showForm = false;
-        _editingProject = null;
-      });
-      ref.read(adminProjectsStateProvider.notifier).refresh();
-    });
+          ToastMessage.success(
+            message: _editingProject == null
+                ? 'Project created successfully'
+                : 'Project updated successfully',
+            ctx: context,
+          );
+          setState(() {
+            _showForm = false;
+            _editingProject = null;
+          });
+          ref.read(adminProjectsStateProvider.notifier).refresh();
+        });
   }
 
   Future<void> _showDeleteDialog(AdminProject project) async {
@@ -198,10 +186,7 @@ class _AdminProjectsPageState extends ConsumerState<AdminProjectsPage> {
       return;
     }
 
-    ToastMessage.success(
-      message: 'Project deleted successfully',
-      ctx: context,
-    );
+    ToastMessage.success(message: 'Project deleted successfully', ctx: context);
   }
 }
 
@@ -232,9 +217,7 @@ class _AdminProjectsHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surface,
         border: Border(
-          bottom: BorderSide(
-            color: colors.textMuted.withValues(alpha: 0.1),
-          ),
+          bottom: BorderSide(color: colors.textMuted.withValues(alpha: 0.1)),
         ),
       ),
       child: Row(
@@ -243,10 +226,7 @@ class _AdminProjectsHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Projects',
-                  style: textStyles.headlineSmallTextStyle,
-                ),
+                Text('Projects', style: textStyles.headlineSmallTextStyle),
                 SizedBox(height: spacing.xs),
                 Text(
                   '$projectCount ${projectCount == 1 ? 'project' : 'projects'}',
@@ -262,7 +242,9 @@ class _AdminProjectsHeader extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: onAddPressed,
                 style: const ButtonStyle(
-                    padding:WidgetStatePropertyAll<EdgeInsetsGeometry>(EdgeInsetsGeometry.symmetric(horizontal: 5))
+                  padding: WidgetStatePropertyAll<EdgeInsetsGeometry>(
+                    EdgeInsetsGeometry.symmetric(horizontal: 5),
+                  ),
                 ),
 
                 icon: const Icon(Icons.add),
@@ -273,7 +255,9 @@ class _AdminProjectsHeader extends StatelessWidget {
             FadeScaleAnimation(
               child: OutlinedButton.icon(
                 style: const ButtonStyle(
-                  padding:WidgetStatePropertyAll<EdgeInsetsGeometry>(EdgeInsetsGeometry.symmetric(horizontal: 10))
+                  padding: WidgetStatePropertyAll<EdgeInsetsGeometry>(
+                    EdgeInsetsGeometry.symmetric(horizontal: 10),
+                  ),
                 ),
                 onPressed: onCancelFormPressed,
                 icon: const Icon(Icons.close),
@@ -285,5 +269,3 @@ class _AdminProjectsHeader extends StatelessWidget {
     );
   }
 }
-
-

@@ -12,7 +12,7 @@ import 'package:easy_porfolio/core/validation/validators.dart';
 /// - Input formatters
 /// - Consistent appearance across the app
 /// - Support for both controller-based and value/onChange patterns
-class AppTextField extends StatelessWidget {
+class AppTextField extends StatefulWidget {
   const AppTextField({
     super.key,
     this.controller,
@@ -73,49 +73,86 @@ class AppTextField extends StatelessWidget {
   final Map<String, dynamic>? customValidationParams;
 
   @override
+  State<AppTextField> createState() => _AppTextFieldState();
+}
+
+class _AppTextFieldState extends State<AppTextField> {
+  TextEditingController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.controller == null && widget.value != null) {
+      _controller = TextEditingController(text: widget.value);
+    }
+  }
+
+  @override
+  void didUpdateWidget(AppTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.controller == null) {
+      if (_controller == null && widget.value != null) {
+        _controller = TextEditingController(text: widget.value);
+      } else if (_controller != null && widget.value != oldWidget.value) {
+        if (widget.value != _controller!.text) {
+          _controller!.text = widget.value ?? '';
+        }
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    if (widget.controller == null) {
+      _controller?.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final spacing = context.spacingTokens;
     final radius = context.radiusTokens;
     final textStyles = context.textStyles;
 
+    final effectiveController = widget.controller ?? _controller;
 
     // Build the validator function
-    String? Function(String?)? finalValidator = validator;
+    String? Function(String?)? finalValidator = widget.validator;
 
-    if (validationType != null && validator == null) {
+    if (widget.validationType != null && widget.validator == null) {
       finalValidator = _buildValidatorFromType();
-    } else if (isRequired && validator == null) {
+    } else if (widget.isRequired && widget.validator == null) {
       finalValidator = (value) => Validators.required(
         value,
-        fieldName: fieldName ?? labelText ?? 'This field',
+        fieldName: widget.fieldName ?? widget.labelText ?? 'This field',
       );
     }
 
     // Build input formatters
     final List<TextInputFormatter> finalFormatters = [];
 
-    if (inputFormatters != null) {
-      finalFormatters.addAll(inputFormatters!);
+    if (widget.inputFormatters != null) {
+      finalFormatters.addAll(widget.inputFormatters!);
     }
 
     // Add trimming formatter for single-line text fields
-    if (maxLines == 1 || maxLines == null) {
+    if (widget.maxLines == 1 || widget.maxLines == null) {
       finalFormatters.add(FilteringTextInputFormatter.deny(RegExp(r'\n')));
     }
 
     return SlideFadeTransitionWidget(
       child: TextFormField(
-        controller: controller,
+        controller: effectiveController,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         decoration: InputDecoration(
-          labelText: labelText,
-          hintText: hintText,
-          helperText: helperText,
-          prefixIcon: prefixIcon,
-          suffixIcon: suffixIcon,
-          enabled: enabled,
-
+          labelText: widget.labelText,
+          hintText: widget.hintText,
+          helperText: widget.helperText,
+          prefixIcon: widget.prefixIcon,
+          suffixIcon: widget.suffixIcon,
+          enabled: widget.enabled,
           border: OutlineInputBorder(
             borderRadius: radius.all8,
             borderSide: BorderSide(
@@ -163,27 +200,29 @@ class AppTextField extends StatelessWidget {
         ),
         style: textStyles.bodyMediumTextStyle,
         validator: finalValidator,
-        onChanged: onChanged,
-        onSaved: onSaved,
-        obscureText: obscureText,
-        maxLines: maxLines,
-        minLines: minLines,
-        maxLength: maxLength,
-        keyboardType: keyboardType,
-        textInputAction: textInputAction,
+        onChanged: (value) {
+          widget.onChanged?.call(value);
+        },
+        onSaved: widget.onSaved,
+        obscureText: widget.obscureText,
+        maxLines: widget.maxLines,
+        minLines: widget.minLines,
+        maxLength: widget.maxLength,
+        keyboardType: widget.keyboardType,
+        textInputAction: widget.textInputAction,
         inputFormatters: finalFormatters.isEmpty ? null : finalFormatters,
-        autofocus: autofocus,
-        readOnly: readOnly,
-        enabled: enabled,
+        autofocus: widget.autofocus,
+        readOnly: widget.readOnly,
+        enabled: widget.enabled,
       ),
     );
   }
 
   String? Function(String?)? _buildValidatorFromType() {
-    final name = fieldName ?? labelText ?? 'This field';
-    final params = customValidationParams ?? {};
+    final name = widget.fieldName ?? widget.labelText ?? 'This field';
+    final params = widget.customValidationParams ?? {};
 
-    switch (validationType!) {
+    switch (widget.validationType!) {
       case ValidationType.required:
         return (value) => Validators.required(value, fieldName: name);
 
@@ -192,21 +231,21 @@ class AppTextField extends StatelessWidget {
           value,
           minLength: params['minLength'] as int? ?? 2,
           maxLength: params['maxLength'] as int? ?? 100,
-          isRequired: isRequired,
+          isRequired: widget.isRequired,
           fieldName: name,
         );
 
       case ValidationType.url:
         return (value) => Validators.url(
           value,
-          isRequired: isRequired,
+          isRequired: widget.isRequired,
           fieldName: name,
         );
 
       case ValidationType.email:
         return (value) => Validators.email(
           value,
-          isRequired: isRequired,
+          isRequired: widget.isRequired,
           fieldName: name,
         );
 
@@ -214,7 +253,7 @@ class AppTextField extends StatelessWidget {
         return (value) => Validators.password(
           value,
           minLength: params['minLength'] as int? ?? 6,
-          isRequired: isRequired,
+          isRequired: widget.isRequired,
           fieldName: name,
         );
 
@@ -223,14 +262,14 @@ class AppTextField extends StatelessWidget {
           value,
           minLength: params['minLength'] as int? ?? 10,
           maxLength: params['maxLength'] as int? ?? 2000,
-          isRequired: isRequired,
+          isRequired: widget.isRequired,
           fieldName: name,
         );
 
       case ValidationType.commaSeparatedList:
         return (value) => Validators.commaSeparatedList(
           value,
-          isRequired: isRequired,
+          isRequired: widget.isRequired,
           fieldName: name,
         );
     }

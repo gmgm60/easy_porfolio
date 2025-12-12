@@ -31,7 +31,7 @@ class AdminProjectsState {
 class AdminProjectsNotifier extends Notifier<AdminProjectsState> {
   @override
   AdminProjectsState build() {
-    _loadProjects();
+    Future.microtask(() => _loadProjects());
     return const AdminProjectsState();
   }
 
@@ -40,17 +40,15 @@ class AdminProjectsNotifier extends Notifier<AdminProjectsState> {
     final useCase = ref.read(getProjectsUseCaseProvider);
     final result = await useCase();
 
-    result.onFailure((failure) {
-      state = state.copyWith(
-        isLoading: false,
-        error: failure.toString(),
-      );
-    }).onSuccess((projects) {
-      state = state.copyWith(
-        projects: projects,
-        isLoading: false,
-      );
-    });
+    if (!ref.mounted) return;
+
+    result
+        .onFailure((failure) {
+          state = state.copyWith(isLoading: false, error: failure.toString());
+        })
+        .onSuccess((projects) {
+          state = state.copyWith(projects: projects, isLoading: false);
+        });
   }
 
   /// Refreshes the projects list.
@@ -63,31 +61,34 @@ class AdminProjectsNotifier extends Notifier<AdminProjectsState> {
     final useCase = ref.read(deleteProjectUseCaseProvider);
     final result = await useCase(id);
 
-    result.onFailure((failure) {
-      state = state.copyWith(error: failure.toString());
-    }).onSuccess((_) {
-      // Remove from local state
-      final updatedProjects = state.projects.where((p) => p.id != id).toList();
-      state = state.copyWith(projects: updatedProjects);
-    });
+    result
+        .onFailure((failure) {
+          state = state.copyWith(error: failure.toString());
+        })
+        .onSuccess((_) {
+          // Remove from local state
+          final updatedProjects = state.projects
+              .where((p) => p.id != id)
+              .toList();
+          state = state.copyWith(projects: updatedProjects);
+        });
   }
 }
 
 /// Provider for admin projects state.
 final adminProjectsStateProvider =
     NotifierProvider<AdminProjectsNotifier, AdminProjectsState>(
-  AdminProjectsNotifier.new,
-);
+      AdminProjectsNotifier.new,
+    );
 
-  /// Provider for a single project by ID.
-final adminProjectByIdProvider =
-    Provider.autoDispose.family<AsyncValue<AdminProject>, String>((ref, id) {
-  final useCase = ref.watch(getProjectByIdUseCaseProvider);
-  return ref.watch(
-    FutureProvider((ref) async {
-      final result = await useCase(id);
-      return result.getOrThrow();
-    }),
-  );
-});
-
+/// Provider for a single project by ID.
+final adminProjectByIdProvider = Provider.autoDispose
+    .family<AsyncValue<AdminProject>, String>((ref, id) {
+      final useCase = ref.watch(getProjectByIdUseCaseProvider);
+      return ref.watch(
+        FutureProvider((ref) async {
+          final result = await useCase(id);
+          return result.getOrThrow();
+        }),
+      );
+    });

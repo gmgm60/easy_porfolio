@@ -12,7 +12,9 @@ class AdaptiveImagePicker implements ImagePickerServices {
       _log = logger ?? const DebugLogger();
 
   @override
-  Future<PickedImage?> pickSingle({ImageSource imgSource = ImageSource.gallery}) async {
+  Future<PickedImage?> pickSingle({
+    ImageSource imgSource = ImageSource.gallery,
+  }) async {
     final XFile? file = await _picker.pickImage(source: imgSource);
     if (file == null) {
       _log.info('Adaptive pickSingle() user canceled.');
@@ -30,19 +32,34 @@ class AdaptiveImagePicker implements ImagePickerServices {
   Future<List<PickedImage>> pickMultiple({
     ImageSource imgSource = ImageSource.gallery,
   }) async {
-    final files = await _picker.pickMultiImage();
-    if (files.isEmpty) {
-      _log.info('Adaptive pickMultiple() user canceled / no images.');
-      return <PickedImage>[];
+    try {
+      // Try multi-image pick first (works on mobile)
+      final files = await _picker.pickMultiImage();
+      if (files.isNotEmpty) {
+        final results = <PickedImage>[];
+        for (final file in files) {
+          final bytes = await file.readAsBytes();
+          results.add(
+            PickedImage(name: file.name, path: file.path, bytes: bytes),
+          );
+        }
+        _log.info('Adaptive pickMultiple() got count=${results.length}');
+        return results;
+      }
+    } catch (e) {
+      // pickMultiImage() not supported (e.g., on web), pick one at a time
+      _log.info('pickMultiImage() not supported, using single pick');
     }
 
-    final results = <PickedImage>[];
-    for (final f in files) {
-      final bytes = await f.readAsBytes();
-      results.add(PickedImage(name: f.name, path: f.path, bytes: bytes));
+    // Fallback: pick one image at a time
+    final file = await _picker.pickImage(source: imgSource);
+    if (file == null) {
+      return [];
     }
 
-    _log.info('Adaptive pickMultiple() got count=${results.length}');
-    return results;
+    final bytes = await file.readAsBytes();
+    final result = PickedImage(name: file.name, path: file.path, bytes: bytes);
+    _log.info('Adaptive pickMultiple() got 1 image');
+    return [result];
   }
 }

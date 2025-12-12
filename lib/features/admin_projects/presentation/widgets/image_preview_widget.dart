@@ -1,50 +1,50 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:easy_porfolio/core/services/image_services/src/core/models/picked_image.dart';
-import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dart';
 import 'package:easy_porfolio/features/admin_projects/presentation/widgets/image_picker_placeholder_widget.dart';
 import 'package:flutter/material.dart';
 
-/// Widget that displays an image preview from either network or memory.
-/// Handles loading states and error cases gracefully.
+/// Widget that displays an image preview from memory only.
 class ImagePreviewWidget extends StatelessWidget {
   const ImagePreviewWidget({super.key, required this.image});
 
   final PickedImage image;
 
+  Uint8List? _getImageBytes() {
+    if (image.bytes != null) {
+      return image.bytes;
+    }
+    if (image.path != null) {
+      try {
+        String base64String = image.path!;
+        // Handle data URL format
+        if (base64String.startsWith('data:image')) {
+          final commaIndex = base64String.indexOf(',');
+          if (commaIndex != -1) {
+            base64String = base64String.substring(commaIndex + 1);
+          }
+        }
+        return base64Decode(base64String);
+      } catch (_) {
+        return null;
+      }
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
-
-    // Display from bytes if available (newly picked image)
-    if (image.bytes != null) {
-      return Image.memory(
-        image.bytes!,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return const ImagePickerPlaceholderWidget();
-        },
-      );
+    final bytes = _getImageBytes();
+    if (bytes == null) {
+      return const ImagePickerPlaceholderWidget();
     }
 
-    // Display from URL if path is available (existing image)
-    if (image.path != null) {
-      return Image.network(
-        image.path!,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return const ImagePickerPlaceholderWidget();
-        },
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) {
-            return child;
-          }
-          return Center(
-            child: CircularProgressIndicator(color: colors.primary),
-          );
-        },
-      );
-    }
-
-    // Fallback to placeholder if no valid image data
-    return const ImagePickerPlaceholderWidget();
+    return Image.memory(
+      bytes,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return const ImagePickerPlaceholderWidget();
+      },
+    );
   }
 }

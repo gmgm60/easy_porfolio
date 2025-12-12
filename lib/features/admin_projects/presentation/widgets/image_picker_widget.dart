@@ -1,6 +1,5 @@
+import 'dart:convert';
 import 'package:easy_porfolio/core/services/image_services/src/core/models/picked_image.dart';
-import 'package:easy_porfolio/core/services/image_services/src/features/compressing/image_compress.dart';
-import 'package:easy_porfolio/core/services/image_services/src/features/compressing/image_compress_service.dart';
 import 'package:easy_porfolio/core/services/image_services/src/features/picking/adaptive_image_picker.dart';
 import 'package:easy_porfolio/core/services/image_services/src/features/picking/image_picker_service.dart';
 import 'package:easy_porfolio/core/services/messaging_service/helper_message.dart';
@@ -36,7 +35,6 @@ class ImagePickerWidget extends StatefulWidget {
 
 class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   final ImagePickerServices _picker = AdaptiveImagePicker();
-  final ImageCompressService _processor = ImageCompress();
   PickedImage? _currentImage;
   bool _isLoading = false;
 
@@ -48,14 +46,25 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
 
   void _initializeImage() {
     if (widget.initialImageUrl != null && widget.initialImageUrl!.isNotEmpty) {
-      _currentImage = PickedImage.fromUrl(widget.initialImageUrl!);
+      try {
+        String base64String = widget.initialImageUrl!;
+        // Handle data URL format
+        if (base64String.startsWith('data:image')) {
+          final commaIndex = base64String.indexOf(',');
+          if (commaIndex != -1) {
+            base64String = base64String.substring(commaIndex + 1);
+          }
+        }
+        final bytes = base64Decode(base64String);
+        _currentImage = PickedImage.fromBytes(bytes);
+      } catch (_) {
+        _currentImage = null;
+      }
     }
   }
 
   Future<void> _pickImage() async {
-    if (_isLoading) {
-      return;
-    }
+    if (_isLoading) return;
 
     setState(() => _isLoading = true);
 
@@ -65,24 +74,18 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
         return;
       }
 
-      final compressed = await _processor.compress(pickedImage);
-
-      if (!mounted) {
-        return;
-      }
-
-
       setState(() {
-        _currentImage = compressed;
+        _currentImage = pickedImage;
       });
 
-      widget.onImagePicked(compressed);
+      widget.onImagePicked(pickedImage);
     } catch (error) {
-      if (!mounted) {
-        return;
+      if (mounted) {
+        ToastMessage.failed(
+          message: 'Error picking image: $error',
+          ctx: context,
+        );
       }
-
-      ToastMessage.failed(message: 'Error picking image: $error', ctx: context);
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

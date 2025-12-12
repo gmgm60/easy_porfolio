@@ -1,6 +1,5 @@
+import 'dart:convert';
 import 'package:easy_porfolio/core/services/image_services/src/core/models/picked_image.dart';
-import 'package:easy_porfolio/core/services/image_services/src/features/compressing/image_compress_service.dart';
-import 'package:easy_porfolio/core/services/image_services/src/features/compressing/mobile_image_compress.dart';
 import 'package:easy_porfolio/core/services/image_services/src/features/picking/adaptive_image_picker.dart';
 import 'package:easy_porfolio/core/services/image_services/src/features/picking/image_picker_service.dart';
 import 'package:flutter/material.dart';
@@ -42,15 +41,29 @@ class MultiImagePickerWidget extends StatefulWidget {
 
 class _MultiImagePickerWidgetState extends State<MultiImagePickerWidget> {
   final ImagePickerServices _imageServices = AdaptiveImagePicker();
-  final ImageCompressService _compress = ImageCompress();
   final List<PickedImage> _images = [];
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    // Initialize with existing images
-    _images.addAll(widget.initialImages.map((url) => PickedImage.fromUrl(url)));
+    // Initialize with existing base64 images
+    for (final base64 in widget.initialImages) {
+      try {
+        String base64String = base64;
+        // Handle data URL format
+        if (base64String.startsWith('data:image')) {
+          final commaIndex = base64String.indexOf(',');
+          if (commaIndex != -1) {
+            base64String = base64String.substring(commaIndex + 1);
+          }
+        }
+        final bytes = base64Decode(base64String);
+        _images.add(PickedImage.fromBytes(bytes));
+      } catch (_) {
+        // Skip invalid base64
+      }
+    }
     // Notify parent of initial state
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_images.isNotEmpty) {
@@ -67,23 +80,22 @@ class _MultiImagePickerWidgetState extends State<MultiImagePickerWidget> {
     setState(() => _isLoading = true);
     try {
       final pickedImages = await _imageServices.pickMultiple();
-
       if (pickedImages.isEmpty) {
         return;
       }
 
+      final newImages = <PickedImage>[];
       for (final pickedImage in pickedImages) {
-        if (widget.maxImages != null && _images.length >= widget.maxImages!) {
+        if (widget.maxImages != null &&
+            _images.length + newImages.length >= widget.maxImages!) {
           break;
         }
-
-        // Compress the image
-        final compressed = await _compress.compress(pickedImage);
-
-        setState(() {
-          _images.add(compressed);
-        });
+        newImages.add(pickedImage);
       }
+
+      setState(() {
+        _images.addAll(newImages);
+      });
 
       _notifyChange();
     } catch (e) {
@@ -217,16 +229,6 @@ class _MultiImagePickerWidgetState extends State<MultiImagePickerWidget> {
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity,
-                )
-              : image.path != null && image.path!.isNotEmpty
-              ? Image.network(
-                  image.path!,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                  errorBuilder: (context, error, stackTrace) {
-                    return _buildPlaceholder(colors, radius, spacing);
-                  },
                 )
               : _buildPlaceholder(colors, radius, spacing),
         ),

@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:easy_porfolio/core/theme/app_colors.dart';
 import 'package:easy_porfolio/core/theme/spacing_tokens.dart';
 import 'package:flutter/material.dart';
@@ -40,10 +42,7 @@ class AdminProjectCardWidget extends StatelessWidget {
                 SizedBox(height: spacing.sm),
                 _AdminProjectInfoSection(project: project),
                 SizedBox(height: spacing.sm),
-                _AdminProjectActionsSection(
-                  onEdit: onEdit,
-                  onDelete: onDelete,
-                ),
+                _AdminProjectActionsSection(onEdit: onEdit, onDelete: onDelete),
               ],
             ),
           ),
@@ -55,29 +54,47 @@ class AdminProjectCardWidget extends StatelessWidget {
 
 /// Private widget: handles image / thumbnail section only.
 class _AdminProjectImageSection extends StatelessWidget {
-  const _AdminProjectImageSection({
-    required this.project,
-  });
+  const _AdminProjectImageSection({required this.project});
 
   final AdminProject project;
+
+  Uint8List? _getImageBytes() {
+    if (project.imageUrl.isEmpty) {
+      return null;
+    }
+    try {
+      // Handle both base64 string and data URL format
+      String base64String = project.imageUrl;
+      if (base64String.startsWith('data:image')) {
+        // Extract base64 from data URL
+        final commaIndex = base64String.indexOf(',');
+        if (commaIndex != -1) {
+          base64String = base64String.substring(commaIndex + 1);
+        }
+      }
+      return base64Decode(base64String);
+    } catch (_) {
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final radius = context.radiusTokens;
-    final spacing = context.spacingTokens;
+    final bytes = _getImageBytes();
 
     return ClipRRect(
       borderRadius: radius.all12,
       child: AspectRatio(
         aspectRatio: 1.3,
-        child: project.imageUrl.isNotEmpty
-            ? Image.network(
-          project.imageUrl,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return const _AdminProjectImagePlaceholder();
-          },
-        )
+        child: bytes != null
+            ? Image.memory(
+                bytes,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return const _AdminProjectImagePlaceholder();
+                },
+              )
             : const _AdminProjectImagePlaceholder(),
       ),
     );
@@ -108,9 +125,7 @@ class _AdminProjectImagePlaceholder extends StatelessWidget {
 
 /// Private widget: title, featured badge, description, technologies.
 class _AdminProjectInfoSection extends StatelessWidget {
-  const _AdminProjectInfoSection({
-    required this.project,
-  });
+  const _AdminProjectInfoSection({required this.project});
 
   final AdminProject project;
 
@@ -125,45 +140,47 @@ class _AdminProjectInfoSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Title + Featured badge
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                project.title,
-                style: textStyles.titleMediumTextStyle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            if (project.isFeatured)
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: spacing.xs,
-                  vertical: spacing.xs / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: colors.primary,
-                  borderRadius: radius.all4,
-                ),
+        if (project.title.isNotEmpty)
+          Row(
+            children: [
+              Expanded(
                 child: Text(
-                  'Featured',
-                  style: textStyles.labelSmallTextStyle.copyWith(
-                    color: colors.onPrimary,
+                  project.title,
+                  style: textStyles.titleMediumTextStyle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (project.isFeatured)
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: spacing.xs,
+                    vertical: spacing.xs / 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colors.primary,
+                    borderRadius: radius.all4,
+                  ),
+                  child: Text(
+                    'Featured',
+                    style: textStyles.labelSmallTextStyle.copyWith(
+                      color: colors.onPrimary,
+                    ),
                   ),
                 ),
-              ),
-          ],
-        ),
-        SizedBox(height: spacing.xs),
+            ],
+          ),
+        if (project.title.isNotEmpty) SizedBox(height: spacing.xs),
 
         // Description
-        Text(
-          project.description,
-          style: textStyles.bodySmallTextStyle,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        SizedBox(height: spacing.sm),
+        if (project.description.isNotEmpty)
+          Text(
+            project.description,
+            style: textStyles.bodySmallTextStyle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        if (project.description.isNotEmpty) SizedBox(height: spacing.sm),
 
         // Technologies
         if (project.technologies.isNotEmpty)
@@ -172,10 +189,7 @@ class _AdminProjectInfoSection extends StatelessWidget {
             runSpacing: spacing.xs,
             children: project.technologies.take(3).map((tech) {
               return Chip(
-                label: Text(
-                  tech,
-                  style: textStyles.labelSmallTextStyle,
-                ),
+                label: Text(tech, style: textStyles.labelSmallTextStyle),
                 padding: EdgeInsets.zero,
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 visualDensity: VisualDensity.compact,
@@ -225,4 +239,3 @@ class _AdminProjectActionsSection extends StatelessWidget {
     );
   }
 }
-

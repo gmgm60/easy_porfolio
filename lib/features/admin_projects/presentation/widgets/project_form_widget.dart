@@ -37,32 +37,86 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
   final _formKey = GlobalKey<FormState>();
 
   late ProjectFormModel _formData;
-  String? _imageUrl;
   Uint8List? _imageBytes;
   List<PickedImage> _screenshots = [];
-  List<String> _existingScreenshotUrls = [];
+
+  void _loadProjectData(AdminProject? project) {
+    setState(() {
+      _formData = ProjectFormModel(
+        title: project?.title ?? '',
+        description: project?.description ?? '',
+        liveDemoUrl: project?.liveDemoUrl ?? '',
+        repositoryUrl: project?.repositoryUrl ?? '',
+        technologies: project?.technologies.join(', ') ?? '',
+        isFeatured: project?.isFeatured ?? false,
+      );
+    });
+
+    // Load existing image from base64
+    Uint8List? imageBytes;
+    if (project?.imageUrl.isNotEmpty ?? false) {
+      try {
+        String base64String = project!.imageUrl;
+        // Handle data URL format
+        if (base64String.startsWith('data:image')) {
+          final commaIndex = base64String.indexOf(',');
+          if (commaIndex != -1) {
+            base64String = base64String.substring(commaIndex + 1);
+          }
+        }
+        imageBytes = base64Decode(base64String);
+      } catch (_) {
+        imageBytes = null;
+      }
+    }
+
+    // Load existing screenshots from base64
+    final screenshots = <PickedImage>[];
+    if (project?.screenshots.isNotEmpty ?? false) {
+      for (final base64 in project!.screenshots) {
+        try {
+          String base64String = base64;
+          // Handle data URL format
+          if (base64String.startsWith('data:image')) {
+            final commaIndex = base64String.indexOf(',');
+            if (commaIndex != -1) {
+              base64String = base64String.substring(commaIndex + 1);
+            }
+          }
+          final bytes = base64Decode(base64String);
+          // Store with both bytes and path for preservation
+          screenshots.add(
+            PickedImage(
+              name: 'screenshot_${screenshots.length}.jpg',
+              path: base64, // Keep original for preservation
+              bytes: bytes,
+            ),
+          );
+        } catch (_) {
+          // Skip invalid base64
+        }
+      }
+    }
+
+    setState(() {
+      _imageBytes = imageBytes;
+      _screenshots = screenshots;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    final project = widget.project;
+    _loadProjectData(widget.project);
+  }
 
-    _formData = ProjectFormModel(
-      title: project?.title ?? '',
-      description: project?.description ?? '',
-      liveDemoUrl: project?.liveDemoUrl ?? '',
-      repositoryUrl: project?.repositoryUrl ?? '',
-      technologies: project?.technologies.join(', ') ?? '',
-      isFeatured: project?.isFeatured ?? false,
-    );
-
-    _imageUrl = project?.imageUrl;
-    _existingScreenshotUrls = List<String>.from(project?.screenshots ?? []);
-
-    // Initialize screenshots with existing URLs
-    _screenshots = _existingScreenshotUrls
-        .map(PickedImage.fromUrl)
-        .toList();
+  @override
+  void didUpdateWidget(ProjectFormWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Always reload data when project changes
+    if (oldWidget.project?.id != widget.project?.id) {
+      _loadProjectData(widget.project);
+    }
   }
 
   void _handleSave() {
@@ -74,7 +128,50 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
     final technologies = _parseTechnologies();
     final now = DateTime.now();
 
-    final screenshotData = _buildScreenshotData();
+    // Preserve existing image if no new image was picked
+    String imageBase64;
+    if (_imageBytes != null) {
+      // New image was picked, encode it
+      imageBase64 = base64Encode(_imageBytes!);
+    } else if (widget.project?.imageUrl.isNotEmpty ?? false) {
+      // Keep existing image (might be base64 or data URL)
+      String existing = widget.project!.imageUrl;
+      if (existing.startsWith('data:image')) {
+        // Extract base64 from data URL
+        final commaIndex = existing.indexOf(',');
+        imageBase64 = commaIndex != -1
+            ? existing.substring(commaIndex + 1)
+            : existing;
+      } else {
+        imageBase64 = existing;
+      }
+    } else {
+      imageBase64 = '';
+    }
+
+    // Encode screenshots to base64 (preserve existing if no new bytes)
+    final screenshotBase64List = <String>[];
+    for (final screenshot in _screenshots) {
+      if (screenshot.bytes != null) {
+        // New screenshot with bytes
+        screenshotBase64List.add(base64Encode(screenshot.bytes!));
+      } else if (screenshot.path != null) {
+        // Existing screenshot (from path/base64)
+        String base64String = screenshot.path!;
+        if (base64String.startsWith('data:image')) {
+          final commaIndex = base64String.indexOf(',');
+          base64String = commaIndex != -1
+              ? base64String.substring(commaIndex + 1)
+              : base64String;
+        }
+        screenshotBase64List.add(base64String);
+      }
+    }
+
+    final screenshotBytesList = _screenshots
+        .where((img) => img.bytes != null)
+        .map((img) => img.bytes!)
+        .toList();
 
     final project = AdminProject(
       id:
@@ -82,7 +179,7 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
           DateTime.now().millisecondsSinceEpoch.toString(),
       title: _formData.title.trim(),
       description: _formData.description.trim(),
-      imageUrl: _imageUrl ?? '',
+      imageUrl: imageBase64,
       isFeatured: _formData.isFeatured,
       technologies: technologies,
       liveDemoUrl: _formData.liveDemoUrl.trim().isEmpty
@@ -91,12 +188,12 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
       repositoryUrl: _formData.repositoryUrl.trim().isEmpty
           ? null
           : _formData.repositoryUrl.trim(),
-      screenshots: screenshotData.urls,
+      screenshots: screenshotBase64List,
       createdAt: widget.project?.createdAt ?? now,
       updatedAt: now,
     );
 
-    widget.onSave(project, _imageBytes, screenshotData.bytes);
+    widget.onSave(project, _imageBytes, screenshotBytesList);
   }
 
   List<String> _parseTechnologies() {
@@ -106,34 +203,6 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
         .map((t) => t.trim())
         .where((t) => t.isNotEmpty)
         .toList();
-  }
-
-  _ScreenshotData _buildScreenshotData() {
-    final screenshotUrls = <String>[];
-    final screenshotBytesList = <Uint8List>[];
-
-    // Keep existing URLs that are still present
-    for (final url in _existingScreenshotUrls) {
-      final stillExists = _screenshots.any((img) => img.path == url);
-      if (stillExists) {
-        screenshotUrls.add(url);
-      }
-    }
-
-    // Add new screenshots (data URLs + bytes)
-    for (final screenshot in _screenshots) {
-      if (screenshot.bytes != null) {
-        final dataUrl =
-            'data:image/jpeg;base64,${base64Encode(screenshot.bytes!)}';
-        screenshotUrls.add(dataUrl);
-        screenshotBytesList.add(screenshot.bytes!);
-      } else if (screenshot.path != null &&
-          !_existingScreenshotUrls.contains(screenshot.path!)) {
-        screenshotUrls.add(screenshot.path!);
-      }
-    }
-
-    return _ScreenshotData(urls: screenshotUrls, bytes: screenshotBytesList);
   }
 
   @override
@@ -151,10 +220,11 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
             children: [
               // Main Project Image Picker
               ImagePickerWidget(
-                initialImageUrl: _imageUrl,
+                initialImageUrl: _imageBytes != null
+                    ? base64Encode(_imageBytes!)
+                    : null,
                 onImagePicked: (PickedImage image) {
                   setState(() {
-                    _imageUrl = image.path;
                     _imageBytes = image.bytes;
                   });
                 },
@@ -175,7 +245,9 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
                 isMobile: isMobile,
                 formData: _formData,
                 onChanged: (updated) {
-                  _formData = updated;
+                  setState(() {
+                    _formData = updated;
+                  });
                 },
               ),
               SizedBox(height: spacing.md),
@@ -183,7 +255,10 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
               // Screenshots Multi-Image Picker
               MultiImagePickerWidget(
                 label: 'Screenshots',
-                initialImages: _existingScreenshotUrls,
+                initialImages: _screenshots
+                    .where((img) => img.bytes != null)
+                    .map((img) => base64Encode(img.bytes!))
+                    .toList(),
                 onImagesChanged: (images) {
                   setState(() {
                     _screenshots = images;
@@ -197,7 +272,9 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
               _ProjectFeaturedSection(
                 value: _formData.isFeatured,
                 onChanged: (value) {
-                  _formData = _formData.copyWith(isFeatured: value ?? false);
+                  setState(() {
+                    _formData = _formData.copyWith(isFeatured: value ?? false);
+                  });
                 },
               ),
               SizedBox(height: spacing.lg),
@@ -214,13 +291,6 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
       ),
     );
   }
-}
-
-class _ScreenshotData {
-  const _ScreenshotData({required this.urls, required this.bytes});
-
-  final List<String> urls;
-  final List<Uint8List> bytes;
 }
 
 /// Title, description, technologies section.

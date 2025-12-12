@@ -27,6 +27,15 @@ class PickedImage {
     throw Exception('No bytes and no path available for image $name');
   }
 
+  /// Creates a PickedImage from bytes.
+  factory PickedImage.fromBytes(Uint8List bytes) {
+    return PickedImage(
+      name: 'image_${DateTime.now().millisecondsSinceEpoch}.jpg',
+      path: null,
+      bytes: bytes,
+    );
+  }
+
   /// Creates a PickedImage from a URL string.
   /// Used when displaying existing images from a server.
   factory PickedImage.fromUrl(String url) {
@@ -41,8 +50,7 @@ class PickedImage {
       if (segments.isNotEmpty) {
         return segments.last;
       }
-    } catch (_) {
-     }
+    } catch (_) {}
     return 'image.jpg';
   }
 
