@@ -1,38 +1,68 @@
-import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:easy_porfolio/features/auth/domain/entities/admin_credentials.dart';
 import 'package:easy_porfolio/features/auth/presentation/providers/auth_providers.dart';
 
-class AdminLoginNotifier extends AsyncNotifier<void> {
+/// Parameter class for login credentials.
+class LoginCredentialsParams {
+  const LoginCredentialsParams({required this.email, required this.password});
 
+  final String email;
+  final String password;
+
+}
+
+/// State class for admin login.
+class AdminLoginState {
+  final bool isLoading;
+  final String? error;
+
+  const AdminLoginState({this.isLoading = false, this.error});
+
+  AdminLoginState copyWith({bool? isLoading, String? error}) {
+    return AdminLoginState(
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+    );
+  }
+}
+
+/// Notifier that handles admin login with automatic loading and error state management.
+class AdminLoginNotifier extends Notifier<AdminLoginState> {
   @override
-  FutureOr<void> build()   {
-    return null;
+  AdminLoginState build() {
+    return const AdminLoginState();
   }
 
-  Future<void> login({
-    required String email,
-    required String password,
-  }) async {
-    state = const AsyncLoading();
+  /// Triggers the login process with the provided credentials.
+  Future<void> login(LoginCredentialsParams params) async {
+    state = state.copyWith(isLoading: true);
 
-    final creds = AdminCredentials(email: email, password: password);
-    final adminLogin = ref.read(adminLoginUseCaseProvider);
-    final result = await adminLogin(creds);
+    final loginUseCase = ref.read(adminLoginUseCaseProvider);
+    final credentials = AdminCredentials(
+      email: params.email.trim(),
+      password: params.password,
+    );
+
+    final result = await loginUseCase(credentials);
 
     if (!ref.mounted) {
       return;
     }
-    // Unwrap at the edge
-    state = result.fold(
-          (ok) => const AsyncData(null),
-          (fail) => AsyncError(fail, StackTrace.current),
+
+    result.fold(
+      (success) {
+        state = const AdminLoginState();
+      },
+      (failure) {
+        state = state.copyWith(isLoading: false, error: failure.message);
+      },
     );
   }
-
 }
 
+/// Provider for admin login state management.
 final adminLoginProvider =
-AsyncNotifierProvider<AdminLoginNotifier, void>(AdminLoginNotifier.new);
+    NotifierProvider.autoDispose<AdminLoginNotifier, AdminLoginState>(
+      AdminLoginNotifier.new,
+    );

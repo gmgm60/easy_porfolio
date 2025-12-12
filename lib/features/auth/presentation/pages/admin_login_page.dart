@@ -1,9 +1,9 @@
-import 'package:easy_porfolio/core/services/messaging_service/helper_message.dart';
+ import 'package:easy_porfolio/core/services/messaging_service/helper_message.dart';
 import 'package:easy_porfolio/core/utils/validator.dart';
 import 'package:easy_porfolio/core/widgets/animated_size_visibility.dart';
 import 'package:easy_porfolio/core/widgets/app_text_field.dart';
 import 'package:easy_porfolio/core/widgets/custom_animated_card.dart';
- import 'package:easy_porfolio/core/widgets/error_banner_widget.dart';
+import 'package:easy_porfolio/core/widgets/error_banner_widget.dart';
 import 'package:easy_porfolio/core/widgets/text_link_widget.dart';
 import 'package:easy_porfolio/features/auth/data/models/login_form_model.dart';
 import 'package:easy_porfolio/features/auth/presentation/providers/admin_login_provider.dart';
@@ -34,6 +34,7 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
   @override
   void initState() {
     super.initState();
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -44,7 +45,6 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
-    // start entrance animation
     _controller.forward();
   }
 
@@ -55,7 +55,6 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
   }
 
   Future<void> _submit() async {
-    // Unfocus to hide keyboard before submitting
     FocusScope.of(context).unfocus();
 
     final form = _formKey.currentState;
@@ -63,29 +62,28 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
       return;
     }
 
-    await ref
-        .read(adminLoginProvider.notifier)
-        .login(email: _formData.email.trim(), password: _formData.password);
+    final params = LoginCredentialsParams(
+      email: _formData.email,
+      password: _formData.password,
+    );
+
+    await ref.read(adminLoginProvider.notifier).login(params);
   }
 
   @override
   Widget build(BuildContext context) {
-    // --- Side effects: toast + navigation ---
-    ref.listen<AsyncValue<void>>(adminLoginProvider, (prev, next) {
-      next.whenOrNull(
-        data: (_) {
-          ToastMessage.success(message: "Logged in successfully", ctx: context);
-          context.go('/dashboard');
-        },
-      );
-    });
+    final loginState = ref.watch(adminLoginProvider);
+    final isSubmitting = loginState.isLoading;
+    final errorMessage = loginState.error;
 
-    final isSubmitting = ref.watch(
-      adminLoginProvider.select((state) => state.isLoading),
-    );
-    final formError = ref.watch(
-      adminLoginProvider.select((state) => state.error),
-    );
+
+    // Handle success side effect
+    ref.listen<AdminLoginState>(adminLoginProvider, (prev, next) {
+      if ((prev?.isLoading ?? false) && !next.isLoading && next.error == null) {
+        ToastMessage.success(message: "Logged in successfully", ctx: context);
+        context.go('/dashboard');
+      }
+    });
 
     return Scaffold(
       body: SafeArea(
@@ -114,6 +112,8 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
                             children: [
                               const Center(child: AdminHeaderWidget()),
                               const SizedBox(height: 32),
+
+                              // Email
                               LabelFieldWidget(
                                 label: "Email",
                                 child: AppTextField(
@@ -123,45 +123,63 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
                                   prefixIcon: const Icon(Icons.mail_outline),
                                   validator: Validators.validateEmail,
                                   onChanged: (value) {
-                                    _formData = _formData.copyWith(
-                                      email: value,
-                                    );
+                                    setState(() {
+                                      _formData = _formData.copyWith(
+                                        email: value,
+                                      );
+                                    });
                                   },
                                 ),
                               ),
 
                               const SizedBox(height: 20),
+
+                              // Password
                               LabelFieldWidget(
                                 label: "Password",
                                 child: PasswordFieldWidget(
                                   value: _formData.password,
                                   onChanged: (value) {
-                                    _formData = _formData.copyWith(
-                                      password: value,
-                                    );
+                                    setState(() {
+                                      _formData = _formData.copyWith(
+                                        password: value,
+                                      );
+                                    });
                                   },
                                   validator: Validators.validatePassword,
                                 ),
                               ),
+
                               const SizedBox(height: 12),
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: TextLinkWidget(
                                   text: "Forgot Password?",
-                                  onPressed: isSubmitting ? null : () {},
+                                  onPressed: isSubmitting
+                                      ? null
+                                      : () {
+                                          /* navigate or show dialog */
+                                        },
                                 ),
                               ),
+
                               const SizedBox(height: 16),
+
+                              // Error banner (animated visibility)
                               AnimatedSizeVisibility(
-                                isVisible: formError != null && !isSubmitting,
+                                isVisible:
+                                    errorMessage != null && !isSubmitting,
                                 child: Padding(
                                   padding: const EdgeInsets.only(bottom: 8.0),
                                   child: ErrorBannerWidget(
-                                    message: formError.toString(),
+                                    message: errorMessage ?? '',
                                   ),
                                 ),
                               ),
+
                               const SizedBox(height: 8),
+
+                              // Primary action
                               PrimaryButtonWidget(
                                 label: "Login",
                                 isLoading: isSubmitting,
