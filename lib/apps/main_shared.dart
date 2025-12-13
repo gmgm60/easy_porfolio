@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:easy_porfolio/core/theme/app_theme.dart';
 import 'package:easy_porfolio/features/theme/data/datasources/theme_local_datasource.dart';
 import 'package:easy_porfolio/features/theme/presentation/providers/theme_provider.dart';
-import 'package:easy_porfolio/features/admin_projects/presentation/providers/admin_projects_providers.dart';
+import 'package:easy_porfolio/features/projects/presentation/providers/projects_providers.dart';
 
 Future<void> runSharedApp({
   required SharedPreferences sharedPreferences,
@@ -29,7 +29,7 @@ Future<void> runSharedApp({
   );
 }
 
- class MyApp extends ConsumerWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key, required this.title, required this.router});
 
   final GoRouter router;

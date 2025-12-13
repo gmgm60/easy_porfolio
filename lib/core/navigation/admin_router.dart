@@ -2,8 +2,8 @@ import 'package:easy_porfolio/features/auth/presentation/pages/admin_login_page.
 import 'package:easy_porfolio/features/dashboard/pages/dashborad_page.dart';
 import 'package:easy_porfolio/features/dashboard/pages/placeholder_page.dart';
 import 'package:easy_porfolio/features/dashboard/pages/responsive_dashboard_scaffold.dart';
-import 'package:easy_porfolio/features/admin_projects/presentation/pages/admin_projects_page.dart';
-import 'package:easy_porfolio/features/admin_projects/presentation/pages/admin_project_details_page.dart';
+import 'package:easy_porfolio/features/projects/presentation/admin/pages/projects_management_page.dart';
+import 'package:easy_porfolio/features/projects/presentation/admin/pages/project_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -39,16 +39,16 @@ final adminRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/Projects',
-              builder: (context, state) => const AdminProjectsPage(),
+              builder: (context, state) => const ProjectsManagementPage(),
               routes: [
                 GoRoute(
                   path: ':id',
                   builder: (context, state) {
                     final id = state.pathParameters['id'];
                     if (id == null || id.isEmpty) {
-                       return const AdminProjectsPage();
+                      return const ProjectsManagementPage();
                     }
-                    return AdminProjectDetailsPage(projectId: id);
+                    return ProjectDetailsPage(projectId: id);
                   },
                 ),
               ],
