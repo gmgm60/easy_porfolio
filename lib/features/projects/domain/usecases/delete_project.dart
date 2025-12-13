@@ -7,7 +7,7 @@ class DeleteProject {
 
   const DeleteProject(this._repository);
 
-  Future<AppUnitResult> call(String id) {
+  AppUnitAsyncResult call(String id) {
     return _repository.deleteProject(id);
   }
 }

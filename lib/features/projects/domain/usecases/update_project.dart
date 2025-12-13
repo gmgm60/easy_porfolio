@@ -8,7 +8,7 @@ class UpdateProject {
 
   const UpdateProject(this._repository);
 
-  Future<AppResult<Project>> call(Project project) {
+  AppAsyncResult<Project> call(Project project) {
     return _repository.updateProject(project);
   }
 }

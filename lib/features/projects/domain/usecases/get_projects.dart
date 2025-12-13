@@ -8,7 +8,7 @@ class GetProjects {
 
   const GetProjects(this._repository);
 
-  Future<AppResult<List<Project>>> call() {
+  AppAsyncResult<List<Project>> call() {
     return _repository.getProjects();
   }
 }

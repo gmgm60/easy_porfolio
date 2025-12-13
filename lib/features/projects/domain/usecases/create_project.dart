@@ -8,7 +8,7 @@ class CreateProject {
 
   const CreateProject(this._repository);
 
-  Future<AppResult<Project>> call(Project project) {
+  AppAsyncResult<Project> call(Project project) {
     return _repository.createProject(project);
   }
 }

@@ -5,17 +5,17 @@ import 'package:easy_porfolio/features/projects/domain/entities/project.dart';
 /// This defines the contract that data layer implementations must follow.
 abstract class ProjectsRepository {
   /// Gets all projects.
-  Future<AppResult<List<Project>>> getProjects();
+  AppAsyncResult<List<Project>> getProjects();
 
   /// Gets a single project by ID.
-  Future<AppResult<Project>> getProjectById(String id);
+  AppAsyncResult<Project>getProjectById(String id);
 
   /// Creates a new project.
-  Future<AppResult<Project>> createProject(Project project);
+  AppAsyncResult<Project> createProject(Project project);
 
   /// Updates an existing project.
-  Future<AppResult<Project>> updateProject(Project project);
+  AppAsyncResult<Project> updateProject(Project project);
 
   /// Deletes a project by ID.
-  Future<AppUnitResult> deleteProject(String id);
+  AppUnitAsyncResult deleteProject(String id);
 }

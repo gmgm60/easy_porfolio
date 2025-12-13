@@ -30,8 +30,7 @@ final adminRouter = GoRouter(
             GoRoute(
               path: '/dashboard',
               builder: (context, state) => const DashboardPage(),
-              // Add sub-routes here if needed, e.g., '/dashboard/details'
-            ),
+             ),
           ],
         ),
         StatefulShellBranch(
@@ -56,7 +55,7 @@ final adminRouter = GoRouter(
           ],
         ),
         StatefulShellBranch(
-          navigatorKey: GlobalKey<NavigatorState>(debugLabel: 'projectsBranch'),
+          navigatorKey: GlobalKey<NavigatorState>(debugLabel: 'MessagesBranch'),
           routes: [
             GoRoute(
               path: '/Messages',

@@ -14,7 +14,7 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
     : _localDataSource = localDataSource;
 
   @override
-  Future<AppResult<List<Project>>> getProjects() async {
+  AppAsyncResult<List<Project>> getProjects() async {
     try {
       final models = await _localDataSource.getProjects();
       final entities = ProjectMapper.toEntityList(models);
@@ -25,7 +25,7 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
   }
 
   @override
-  Future<AppResult<Project>> getProjectById(String id) async {
+  AppAsyncResult<Project> getProjectById(String id) async {
     try {
       final model = await _localDataSource.getProjectById(id);
       if (model == null) {
@@ -39,7 +39,7 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
   }
 
   @override
-  Future<AppResult<Project>> createProject(Project project) async {
+  AppAsyncResult<Project> createProject(Project project) async {
     try {
       final model = ProjectMapper.toModel(project);
       final created = await _localDataSource.createProject(model);
@@ -51,7 +51,7 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
   }
 
   @override
-  Future<AppResult<Project>> updateProject(Project project) async {
+  AppAsyncResult<Project> updateProject(Project project) async {
     try {
       final model = ProjectMapper.toModel(project);
       final updated = await _localDataSource.updateProject(model);
@@ -63,7 +63,7 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
   }
 
   @override
-  Future<AppUnitResult> deleteProject(String id) async {
+  AppUnitAsyncResult deleteProject(String id) async {
     try {
       await _localDataSource.deleteProject(id);
       return const Success(unit);

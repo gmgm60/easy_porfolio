@@ -8,7 +8,7 @@ class GetProjectById {
 
   const GetProjectById(this._repository);
 
-  Future<AppResult<Project>> call(String id) {
+  AppAsyncResult<Project> call(String id) {
     return _repository.getProjectById(id);
   }
 }
