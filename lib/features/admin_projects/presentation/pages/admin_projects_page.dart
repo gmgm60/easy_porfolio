@@ -13,6 +13,7 @@ import 'package:easy_porfolio/features/admin_projects/presentation/providers/adm
 import 'package:easy_porfolio/features/admin_projects/presentation/providers/admin_projects_providers.dart';
 import 'package:easy_porfolio/features/admin_projects/presentation/widgets/admin_projects_list_widget.dart';
 import 'package:easy_porfolio/features/admin_projects/presentation/widgets/project_form_widget.dart';
+import 'package:go_router/go_router.dart';
 
 /// Main page for managing admin projects.
 class AdminProjectsPage extends ConsumerStatefulWidget {
@@ -120,7 +121,7 @@ class _AdminProjectsPageState extends ConsumerState<AdminProjectsPage> {
     return AdminProjectsListWidget(
       projects: state.projects,
       onProjectTap: (project) {
-        // Navigate to project details if needed
+        context.push('/Projects/${project.id}');
       },
       onEdit: (project) {
         setState(() {

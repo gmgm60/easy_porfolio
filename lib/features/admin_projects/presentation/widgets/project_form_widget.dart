@@ -235,7 +235,9 @@ class _ProjectFormWidgetState extends State<ProjectFormWidget> {
               _ProjectMainFieldsSection(
                 formData: _formData,
                 onChanged: (updated) {
-                  _formData = updated;
+                  setState(() {
+                    _formData = updated;
+                  });
                 },
               ),
               SizedBox(height: spacing.md),
