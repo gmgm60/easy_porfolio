@@ -33,9 +33,10 @@ class AdaptiveApp extends StatelessWidget {
 
   bool get isIOS => defaultTargetPlatform == TargetPlatform.iOS;
 
+  SystemUiOverlayStyle get overlay => materialTheme.systemBars;
+
   @override
   Widget build(BuildContext context) {
-    final SystemUiOverlayStyle overlay = materialTheme.systemBars;
     if (isIOS) {
       // Pure Cupertino shell (router-based) with Material theming available
       return CupertinoApp.router(

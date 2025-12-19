@@ -1,7 +1,9 @@
- import 'package:easy_porfolio/features/auth/presentation/pages/admin_login_page.dart';
+import 'package:easy_porfolio/features/auth/presentation/pages/admin_login_page.dart';
 import 'package:easy_porfolio/features/dashboard/pages/dashborad_page.dart';
 import 'package:easy_porfolio/features/dashboard/pages/placeholder_page.dart';
 import 'package:easy_porfolio/features/dashboard/pages/responsive_dashboard_scaffold.dart';
+import 'package:easy_porfolio/features/projects/presentation/admin/pages/projects_management_page.dart';
+import 'package:easy_porfolio/features/projects/presentation/admin/pages/project_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -28,8 +30,7 @@ final adminRouter = GoRouter(
             GoRoute(
               path: '/dashboard',
               builder: (context, state) => const DashboardPage(),
-              // Add sub-routes here if needed, e.g., '/dashboard/details'
-            ),
+             ),
           ],
         ),
         StatefulShellBranch(
@@ -37,13 +38,24 @@ final adminRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/Projects',
-              builder: (context, state) =>
-                  const PlaceholderPage(title: 'Projects'),
+              builder: (context, state) => const ProjectsManagementPage(),
+              routes: [
+                GoRoute(
+                  path: ':id',
+                  builder: (context, state) {
+                    final id = state.pathParameters['id'];
+                    if (id == null || id.isEmpty) {
+                      return const ProjectsManagementPage();
+                    }
+                    return ProjectDetailsPage(projectId: id);
+                  },
+                ),
+              ],
             ),
           ],
         ),
         StatefulShellBranch(
-          navigatorKey: GlobalKey<NavigatorState>(debugLabel: 'projectsBranch'),
+          navigatorKey: GlobalKey<NavigatorState>(debugLabel: 'MessagesBranch'),
           routes: [
             GoRoute(
               path: '/Messages',

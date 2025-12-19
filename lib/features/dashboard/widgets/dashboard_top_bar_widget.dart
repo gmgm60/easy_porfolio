@@ -2,7 +2,7 @@ import 'package:easy_porfolio/core/theme/extension/font_scaling_extension.dart';
 import 'package:easy_porfolio/core/theme/extension/theme_accessors_extension.dart';
 import 'package:flutter/material.dart';
 
-/// Top bar is public so other screens (placeholder pages) can reuse it.
+/// Top bar is user so other screens (placeholder pages) can reuse it.
 class DashboardTopBarWidget extends StatelessWidget {
   final VoidCallback onPressedMenu;
 

@@ -68,7 +68,7 @@ ThemeData applyComponentThemes(
         textStyle: label
             ?.merge(r.buttonTextStyle)
             .copyWith(color: appColors.onSurface),
-        minimumSize: const Size(100, 40),
+        minimumSize: const Size(100, 50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),
@@ -81,7 +81,7 @@ ThemeData applyComponentThemes(
         textStyle: label
             ?.merge(r.buttonTextStyle)
             .copyWith(color: appColors.primary),
-        minimumSize: const Size(100, 40),
+        minimumSize: const Size(100, 50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),

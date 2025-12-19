@@ -1,23 +1,18 @@
-enum DrawerItemType {
-  dashboard,
-  projects,
-  messages,
-  settings,
-}
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
+enum DrawerItemType {
+  dashboard(Icons.dashboard_outlined),
+  projects(Icons.view_kanban_outlined),
+  messages(Icons.mail_outline),
+  settings(Icons.settings_outlined);
+
+  final IconData icon;
+
+  const DrawerItemType(this.icon);
+}
 
 // Helper to map the shell's index to our DrawerItemType enum
 DrawerItemType indexToDrawerItem(int index) {
-  switch (index) {
-    case 0:
-      return DrawerItemType.dashboard;
-    case 1:
-      return DrawerItemType.projects;
-    case 2:
-      return DrawerItemType.messages;
-    case 3:
-      return DrawerItemType.settings;
-    default:
-      return DrawerItemType.dashboard;
-  }
+  return DrawerItemType.values[index];
 }

@@ -26,8 +26,7 @@ class PrimaryButtonWidget extends StatelessWidget {
           child: Text(
             label,
 
-            key: const ValueKey("label"),
-            style: context.textStyles.buttonTextStyle.copyWith(
+             style: context.textStyles.buttonTextStyle.copyWith(
               fontWeight: FontWeight.w600,
             ),
           ),
