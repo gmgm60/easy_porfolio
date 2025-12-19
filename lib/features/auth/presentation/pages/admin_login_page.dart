@@ -1,0 +1,174 @@
+import 'package:easy_porfolio/core/services/messaging_service/helper_message.dart';
+ import 'package:easy_porfolio/core/utils/validator.dart';
+import 'package:easy_porfolio/core/widgets/animated_size_visibility.dart';
+import 'package:easy_porfolio/core/widgets/custom_animated_card.dart';
+import 'package:easy_porfolio/core/widgets/error_banner_widget.dart';
+import 'package:easy_porfolio/core/widgets/text_link_widget.dart';
+import 'package:easy_porfolio/features/auth/presentation/providers/admin_login_provider.dart';
+import 'package:easy_porfolio/features/auth/presentation/widgets/admin_header_widget.dart';
+import 'package:easy_porfolio/features/auth/presentation/widgets/auth_text_field_widget.dart';
+import 'package:easy_porfolio/features/auth/presentation/widgets/label_field_widget.dart';
+import 'package:easy_porfolio/features/auth/presentation/widgets/passord_field_widget.dart';
+import 'package:easy_porfolio/features/auth/presentation/widgets/primary_button_widget.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+class AdminLoginPage extends ConsumerStatefulWidget {
+  const AdminLoginPage({super.key});
+
+  @override
+  ConsumerState<AdminLoginPage> createState() => _AdminLoginPageState();
+}
+
+class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
+    with SingleTickerProviderStateMixin {
+  final _formKey = GlobalKey<FormState>();
+  final _emailCtrl = TextEditingController();
+  final _passwordCtrl = TextEditingController();
+
+  late final AnimationController _controller;
+  late final Animation<double> _fade;
+  late final Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+    _slide = Tween<Offset>(
+      begin: const Offset(0, 0.06),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+
+    // start entrance animation
+    _controller.forward();
+
+
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _emailCtrl.dispose();
+    _passwordCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    // Unfocus to hide keyboard before submitting
+    FocusScope.of(context).unfocus();
+
+    final form = _formKey.currentState;
+    if (form == null || !form.validate()) {
+      return;
+    }
+
+    await ref
+        .read(adminLoginProvider.notifier)
+        .login(email: _emailCtrl.text.trim(), password: _passwordCtrl.text);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // --- Side effects: toast + navigation ---
+    ref.listen<AsyncValue<void>>(adminLoginProvider, (prev, next) {
+      next.whenOrNull(
+        data: (_) {
+          ToastMessage.success(message: "Logged in successfully", ctx: context);
+          context.go('/dashboard');
+        },
+       );
+    });
+
+    final isSubmitting = ref.watch(adminLoginProvider.select((state) => state.isLoading));
+     final formError = ref.watch(adminLoginProvider.select((state) => state.error));
+
+    return Scaffold(
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = constraints.maxWidth > 600;
+
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 420),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isWide ? 0 : 24,
+                    vertical: 24,
+                  ),
+                  child: FadeTransition(
+                    opacity: _fade,
+                    child: SlideTransition(
+                      position: _slide,
+                      child: CustomAnimatedCard(
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Center(child: AdminHeaderWidget()),
+                              const SizedBox(height: 32),
+                              LabelFieldWidget(
+                                label: "Email",
+                                child: AuthTextFieldWidget(
+                                  controller: _emailCtrl,
+                                  hintText: "Enter your email",
+                                  keyboardType: TextInputType.emailAddress,
+                                  prefixIcon: Icons.mail_outline,
+                                  validator: Validators.validateEmail,
+                                ),
+                              ),
+
+                              const SizedBox(height: 20),
+                              LabelFieldWidget(
+                                label: "Password",
+                                child: PasswordFieldWidget(
+                                  controller: _passwordCtrl,
+                                  validator: Validators.validatePassword,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextLinkWidget(
+                                  text: "Forgot Password?",
+                                  onPressed: isSubmitting ? null : () {},
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              AnimatedSizeVisibility(
+                                isVisible: formError != null && !isSubmitting,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: ErrorBannerWidget(
+                                    message: formError.toString(),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              PrimaryButtonWidget(
+                                label: "Login",
+                                isLoading: isSubmitting,
+                                onPressed: isSubmitting ? null : _submit,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}

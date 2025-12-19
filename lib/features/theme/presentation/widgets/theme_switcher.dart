@@ -1,4 +1,5 @@
 
+import 'package:easy_porfolio/core/theme/app_theme_types.dart';
 import 'package:easy_porfolio/features/theme/presentation/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +13,7 @@ class ThemeSwitcher extends ConsumerWidget {
 
     return IconButton(
       icon: Icon(
-        themeMode == ThemeMode.light ? Icons.light_mode : Icons.dark_mode,
+        themeMode == AppThemeType.light ? Icons.light_mode : Icons.dark_mode,
       ),
       onPressed: () {
         ref.read(themeProvider.notifier).toggleTheme();

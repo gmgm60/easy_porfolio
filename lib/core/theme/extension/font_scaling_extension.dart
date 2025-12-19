@@ -8,4 +8,9 @@ extension ResponsiveExtensions on num {
   /// Scale for font sizes with clamping.
   double sp(BuildContext context) =>
      ResponsiveUtil.scaleFont(context, toDouble());
+
+  /// Scale for dimensions: padding, margins, etc.
+  double dp(BuildContext context) =>
+      ResponsiveUtil.scale(context, toDouble());
+
 }

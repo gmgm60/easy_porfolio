@@ -67,7 +67,9 @@ class SpacingTokens extends ThemeExtension<SpacingTokens> {
 
   @override
   SpacingTokens lerp(ThemeExtension<SpacingTokens>? other, double t) {
-    if (other is! SpacingTokens) return this;
+    if (other is! SpacingTokens) {
+      return this;
+    }
     double l(double a, double b) => a + (b - a) * t;
     return SpacingTokens(
       spacing4:  l(spacing4,  other.spacing4),

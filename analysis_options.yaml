@@ -1,6 +1,9 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
+  plugins:
+    - custom_lint
+
   # --- Language & typing strictness ---
   strong-mode:
     implicit-casts: false           # Catch hidden runtime casts
